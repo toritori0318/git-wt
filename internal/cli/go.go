@@ -36,7 +36,6 @@ func (e *NoMatchError) Error() string {
 }
 
 type goCmdConfig struct {
-	noFzf bool
 	index int
 }
 
@@ -61,7 +60,6 @@ Examples:
 		},
 	}
 
-	cmd.Flags().BoolVar(&cfg.noFzf, "no-fzf", false, "Don't use fzf")
 	cmd.Flags().IntVar(&cfg.index, "index", -1, "Non-interactive mode: select specified index")
 
 	return cmd
@@ -150,14 +148,14 @@ func selectWorktreeIndex(
 
 	// Case 2: Query-based selection
 	if query != "" {
-		return selectByQuery(items, query, cfg.noFzf)
+		return selectByQuery(items, query)
 	}
 
 	// Case 3: Interactive selection
-	return selectWorktree(items, "Select worktree", cfg.noFzf)
+	return selectWorktree(items, "Select worktree")
 }
 
-func selectByQuery(items []string, query string, noFzf bool) (int, error) {
+func selectByQuery(items []string, query string) (int, error) {
 	filtered, err := selectx.FilterByQuery(items, query)
 	if err != nil {
 		return 0, &NoMatchError{Query: query}
@@ -174,7 +172,7 @@ func selectByQuery(items []string, query string, noFzf bool) (int, error) {
 		filteredItems[i] = f.Text
 	}
 
-	idx, err := selectWorktree(filteredItems, "Select worktree", noFzf)
+	idx, err := selectWorktree(filteredItems, "Select worktree")
 	if err != nil {
 		return 0, err
 	}
@@ -182,8 +180,8 @@ func selectByQuery(items []string, query string, noFzf bool) (int, error) {
 	return filtered[idx].Index, nil
 }
 
-func selectWorktree(items []string, prompt string, noFzf bool) (int, error) {
-	if !noFzf && selectx.IsFzfAvailable() {
+func selectWorktree(items []string, prompt string) (int, error) {
+	if selectx.IsFzfAvailable() {
 		return selectx.SelectWithFzf(items, prompt)
 	}
 	return selectx.SelectWithPrompt(items, prompt)

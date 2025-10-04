@@ -85,7 +85,7 @@ func runCleanWithConfig(cmd *cobra.Command, args []string, cfg *cleanCmdConfig) 
 	}
 
 	// Select worktree to remove
-	selectedIndex, err := selectWorktreeByQueryOrInteractive(items, query, "Select worktree to remove", false)
+	selectedIndex, err := selectWorktreeByQueryOrInteractive(items, query, "Select worktree to remove")
 	if err != nil {
 		return err
 	}

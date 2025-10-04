@@ -102,8 +102,11 @@ The `--cd` flag outputs only the path (for shell function navigation) instead of
 ```bash
 gwt go                # Interactive selection (uses fzf if available)
 gwt go feature        # Filter by keyword (partial match), auto-select if only one match
-gwt go --no-fzf       # Use numbered selection instead of fzf
 ```
+
+**Selection UI:**
+- **fzf installed**: Uses fzf for fuzzy-finding with real-time filtering
+- **fzf not installed**: Automatically falls back to numbered selection menu
 
 **How filtering works:** Searches for substring matches (case-insensitive). If multiple matches found, shows selection UI. If only one match, navigates immediately.
 

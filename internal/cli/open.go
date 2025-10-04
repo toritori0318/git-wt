@@ -73,7 +73,7 @@ func runOpenWithConfig(cmd *cobra.Command, args []string, cfg *openCmdConfig) er
 	items := createDisplayItems(worktrees)
 
 	// Select worktree
-	selectedIndex, err := selectWorktreeByQueryOrInteractive(items, query, "Select worktree to open", false)
+	selectedIndex, err := selectWorktreeByQueryOrInteractive(items, query, "Select worktree to open")
 	if err != nil {
 		return err
 	}
@@ -98,11 +98,11 @@ func runOpenWithConfig(cmd *cobra.Command, args []string, cfg *openCmdConfig) er
 	return nil
 }
 
-func selectWorktreeByQueryOrInteractive(items []string, query string, prompt string, noFzf bool) (int, error) {
+func selectWorktreeByQueryOrInteractive(items []string, query string, prompt string) (int, error) {
 	if query != "" {
-		return selectByQuery(items, query, noFzf)
+		return selectByQuery(items, query)
 	}
-	return selectWorktree(items, prompt, noFzf)
+	return selectWorktree(items, prompt)
 }
 
 func printOpeningMessage(w io.Writer, path, editorPath string, quiet bool) {
