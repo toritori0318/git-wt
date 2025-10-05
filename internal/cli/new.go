@@ -39,7 +39,16 @@ func newNewCmd() *cobra.Command {
 Worktrees are automatically placed using the naming convention <repo>-<branch>.
 If an existing branch is specified, that branch will be checked out.
 For new branches, they are created from start-point (defaults to current HEAD if omitted).`,
-		Args: cobra.RangeArgs(1, 2),
+		Args: func(cmd *cobra.Command, args []string) error {
+			if len(args) < 1 || len(args) > 2 {
+				cmd.Help()
+				if len(args) == 0 {
+					return fmt.Errorf("\nError: missing required argument <branch>")
+				}
+				return fmt.Errorf("\nError: too many arguments (expected 1-2, got %d)", len(args))
+			}
+			return nil
+		},
 		RunE: func(c *cobra.Command, args []string) error {
 			return runNewWithConfig(c, args, cfg)
 		},
