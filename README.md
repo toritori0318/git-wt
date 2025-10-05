@@ -5,8 +5,9 @@ A CLI tool that makes git worktree management intuitive through conventions and 
 ## What is gwt?
 
 `gwt` simplifies working with multiple git branches simultaneously by:
-- **Auto-organizing worktrees** in sibling directories (`myproject-feature-name`)
+- **Auto-organizing worktrees** in subdirectories (`myproject-wt/feature-name`)
 - **Interactive selection** with fzf for navigation and cleanup
+- **Configurable directory structure** - subdirectory or sibling mode
 - **Single binary** - no runtime dependencies
 
 `gwt` is a complete wrapper around git worktree, meaning all git worktree commands work through gwt:
@@ -22,8 +23,8 @@ cd /work/myproject
 git worktree add ../myproject-feature-login -b feature/login
 cd ../myproject-feature-login
 
-# With gwt
-gwt new feature/login  # Creates and navigates automatically
+# With gwt (subdirectory mode)
+gwt new feature/login  # Creates myproject-wt/feature-login and navigates automatically
 ```
 
 ## Requirements
@@ -91,10 +92,12 @@ type gwt  # Should show "gwt is a function"
 
 ### Create Worktree
 ```bash
-gwt new feature/new-ui              # Creates ../myproject-feature-new-ui
+gwt new feature/new-ui              # Creates ../myproject-wt/feature-new-ui (subdirectory mode)
 gwt new feature/fix --cd            # Create and navigate immediately
 gwt new bugfix/123 main             # Create from specific branch/commit
 ```
+
+By default, worktrees are organized in subdirectories (`<repo>-wt/<branch>`). You can customize this behavior using `gwt config` (see Configuration section).
 
 The `--cd` flag outputs only the path (for shell function navigation) instead of user-friendly messages.
 
@@ -142,6 +145,23 @@ gwt open --editor code main   # Open with specific editor
 ```
 
 Editor priority: `--editor` flag → `GWT_EDITOR` → `VISUAL` → `EDITOR` → auto-detect (code, idea, subl, vim, vi).
+
+### Configuration
+
+```bash
+gwt config list    # Show all settings
+gwt config get worktree.directory_format
+gwt config set worktree.directory_format sibling
+gwt config reset   # Reset to defaults
+```
+
+**Configuration file:** `~/.config/gwt/config.yaml`
+
+**Directory modes:**
+- `subdirectory` (default): Organizes worktrees in `<repo>-wt/<branch>` structure
+- `sibling`: Places worktrees as `<repo>-<branch>` (legacy mode)
+
+For detailed configuration options, directory structure examples, and best practices, see [CONFIGURATION.md](CONFIGURATION.md).
 
 ### Shell Integration Setup
 ```bash
@@ -282,6 +302,7 @@ The embedded versions in `internal/cli/hook_*.sh` and `internal/cli/hook_*.fish`
 
 ## Documentation
 
+- [Configuration Guide](CONFIGURATION.md) - Worktree directory settings and configuration options
 - [Detailed Installation Guide](INSTALL.md)
 
 ## License

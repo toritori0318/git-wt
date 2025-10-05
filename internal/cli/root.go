@@ -54,6 +54,11 @@ It manages worktrees in sibling directories with automatic naming conventions.`,
 	},
 	SilenceErrors: true,
 	SilenceUsage:  true,
+	// Allow unknown flags to pass through to subcommands
+	// This enables arguments like "-wttt" to be used as values
+	FParseErrWhitelist: cobra.FParseErrWhitelist{
+		UnknownFlags: true,
+	},
 	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 		// Set debug mode
 		if flagDebug {
@@ -70,9 +75,17 @@ It manages worktrees in sibling directories with automatic naming conventions.`,
 }
 
 func init() {
+	// Enable TraverseChildren to parse flags on both root and subcommands
+	// This allows subcommands to handle their own arguments correctly
+	rootCmd.TraverseChildren = true
+
 	rootCmd.PersistentFlags().StringVar(&flagRepo, "repo", "", "Manually specify repository root path")
 	rootCmd.PersistentFlags().BoolVar(&flagQuiet, "quiet", false, "Minimal output")
 	rootCmd.PersistentFlags().BoolVar(&flagDebug, "debug", false, "Debug mode (show command execution)")
+
+	// Disable interspersed flags to allow subcommand arguments that start with '-'
+	// This prevents arguments like "-wttt" from being interpreted as global flags
+	rootCmd.Flags().SetInterspersed(false)
 
 	// Set custom help template with passthrough section only for root
 	rootCmd.SetHelpTemplate(`{{with (or .Long .Short)}}{{. | trimTrailingWhitespaces}}
@@ -115,6 +128,19 @@ func shouldPassthrough(err error) bool {
 	if err == nil {
 		return false
 	}
+
+	// Don't passthrough if user is trying to use a known subcommand
+	// This prevents issues with arguments that look like flags (e.g., "-wttt")
+	if len(os.Args) > 1 {
+		subcommand := os.Args[1]
+		knownSubcommands := []string{"config", "new", "go", "clean", "pr", "open", "hook", "tmux"}
+		for _, known := range knownSubcommands {
+			if subcommand == known {
+				return false
+			}
+		}
+	}
+
 	msg := strings.ToLower(err.Error())
 	return strings.Contains(msg, "unknown command") ||
 		strings.Contains(msg, "unknown flag") ||
