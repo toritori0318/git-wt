@@ -1,28 +1,28 @@
-# gwt shell function (for fish)
+# wt shell function (for fish)
 #
 # Installation:
-#   1. Copy this file to ~/.config/fish/functions/gwt.fish
+#   1. Copy this file to ~/.config/fish/functions/wt.fish
 #   2. Restart fish shell
 #
 # Note: It's recommended to use the hook command instead:
-#   gwt hook fish > ~/.config/fish/functions/gwt.fish
+#   wt hook fish > ~/.config/fish/functions/wt.fish
 
-# gwt - Git worktree helper
-# Shell function: gwt go / any command --cd executes actual cd
+# wt - Git worktree helper
+# Shell function: wt go / any command --cd executes actual cd
 
-function gwt
+function wt
     if test (count $argv) -gt 0; and test $argv[1] = "go"
         set -e argv[1]
         # Fast-path: delegate help/version directly to binary
         for arg in $argv
             switch $arg
                 case -h --help help --version
-                    command gwt go $argv
+                    command wt go $argv
                     return $status
             end
         end
 
-        set -l out (command gwt go --quiet $argv)
+        set -l out (command wt go --quiet $argv)
         set -l code $status
 
         # If command failed, print output and return code
@@ -40,7 +40,7 @@ function gwt
         end
     else if contains -- --cd $argv
         # If --cd flag exists, get path and cd
-        set -l out (command gwt $argv)
+        set -l out (command wt $argv)
         set -l code $status
 
         if test $code -ne 0
@@ -55,21 +55,21 @@ function gwt
         end
     else
         # Delegate other commands to binary
-        command gwt $argv
+        command wt $argv
     end
 end
 
 # Completion configuration
-complete -c gwt -f
+complete -c wt -f
 
 # Subcommand completion
-complete -c gwt -n "__fish_use_subcommand" -a "new" -d "Create new worktree"
-complete -c gwt -n "__fish_use_subcommand" -a "go" -d "Navigate between worktrees"
-complete -c gwt -n "__fish_use_subcommand" -a "clean" -d "Remove worktrees"
-complete -c gwt -n "__fish_use_subcommand" -a "open" -d "Open worktree in editor"
-complete -c gwt -n "__fish_use_subcommand" -a "pr" -d "Create worktree for PR review"
-complete -c gwt -n "__fish_use_subcommand" -a "hook" -d "Output shell hook scripts"
-complete -c gwt -n "__fish_use_subcommand" -a "help" -d "Show help"
+complete -c wt -n "__fish_use_subcommand" -a "new" -d "Create new worktree"
+complete -c wt -n "__fish_use_subcommand" -a "go" -d "Navigate between worktrees"
+complete -c wt -n "__fish_use_subcommand" -a "clean" -d "Remove worktrees"
+complete -c wt -n "__fish_use_subcommand" -a "open" -d "Open worktree in editor"
+complete -c wt -n "__fish_use_subcommand" -a "pr" -d "Create worktree for PR review"
+complete -c wt -n "__fish_use_subcommand" -a "hook" -d "Output shell hook scripts"
+complete -c wt -n "__fish_use_subcommand" -a "help" -d "Show help"
 
-# Branch name completion for gwt go
-complete -c gwt -n "__fish_seen_subcommand_from go" -a "(git worktree list --porcelain 2>/dev/null | grep '^branch' | awk '{print \$2}' | sed 's|refs/heads/||')"
+# Branch name completion for wt go
+complete -c wt -n "__fish_seen_subcommand_from go" -a "(git worktree list --porcelain 2>/dev/null | grep '^branch' | awk '{print \$2}' | sed 's|refs/heads/||')"

@@ -9,7 +9,7 @@ import (
 	"strings"
 
 	"github.com/spf13/cobra"
-	"github.com/toritsuyo/gwt/internal/gitx"
+	"github.com/toritsuyo/wt/internal/gitx"
 )
 
 // NoRemovableWorktreesError represents an error when no removable worktrees are found

@@ -8,8 +8,8 @@ import (
 	"strings"
 
 	"github.com/spf13/cobra"
-	"github.com/toritsuyo/gwt/internal/gitx"
-	"github.com/toritsuyo/gwt/internal/naming"
+	"github.com/toritsuyo/wt/internal/gitx"
+	"github.com/toritsuyo/wt/internal/naming"
 )
 
 // BranchInUseError represents an error when a branch is already in use
@@ -19,7 +19,7 @@ type BranchInUseError struct {
 }
 
 func (e *BranchInUseError) Error() string {
-	return fmt.Sprintf("branch '%s' is already in use at %s.\nNavigate: gwt go %s\nOpen: gwt open %s",
+	return fmt.Sprintf("branch '%s' is already in use at %s.\nNavigate: wt go %s\nOpen: wt open %s",
 		e.Branch, e.Path, e.Branch, e.Branch)
 }
 

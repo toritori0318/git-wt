@@ -5,9 +5,9 @@ import (
 	"fmt"
 
 	"github.com/spf13/cobra"
-	"github.com/toritsuyo/gwt/internal/gitx"
-	"github.com/toritsuyo/gwt/internal/naming"
-	"github.com/toritsuyo/gwt/internal/tmux"
+	"github.com/toritsuyo/wt/internal/gitx"
+	"github.com/toritsuyo/wt/internal/naming"
+	"github.com/toritsuyo/wt/internal/tmux"
 )
 
 type tmuxNewConfig struct {
@@ -44,9 +44,9 @@ func newTmuxNewCmd() *cobra.Command {
 Creates worktrees with numbered suffixes (branch-1, branch-2, etc.) and opens them in tmux panes.
 
 Examples:
-  gwt tmux new feature/auth
-  gwt tmux new feature/auth --count 3
-  gwt tmux new feature/auth main --count 3 --sync-panes`,
+  wt tmux new feature/auth
+  wt tmux new feature/auth --count 3
+  wt tmux new feature/auth main --count 3 --sync-panes`,
 		Args: cobra.RangeArgs(1, 2),
 		RunE: func(c *cobra.Command, args []string) error {
 			return runTmuxNew(c, args, cfg)
@@ -147,7 +147,7 @@ func runTmuxNew(cmd *cobra.Command, args []string, cfg *tmuxNewConfig) error {
 	tmuxName := cfg.sessionName
 	if tmuxName == "" {
 		// Generate session name from branch prefix
-		tmuxName = fmt.Sprintf("gwt-%s-%s", repo.Name, naming.Sanitize(branchPrefix))
+		tmuxName = fmt.Sprintf("wt-%s-%s", repo.Name, naming.Sanitize(branchPrefix))
 	} else {
 		// Sanitize user-specified session name to prevent command injection
 		tmuxName = naming.Sanitize(tmuxName)

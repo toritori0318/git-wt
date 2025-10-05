@@ -12,7 +12,7 @@ func FindEditor(preferredEditor string) (string, error) {
 	// Search for editor in priority order
 	candidates := []string{
 		preferredEditor,
-		os.Getenv("GWT_EDITOR"),
+		os.Getenv("WT_EDITOR"),
 		os.Getenv("VISUAL"),
 		os.Getenv("EDITOR"),
 		"code",   // VS Code
@@ -40,7 +40,7 @@ func FindEditor(preferredEditor string) (string, error) {
 		}
 	}
 
-	return "", fmt.Errorf("no editor found. Please set GWT_EDITOR, VISUAL, or EDITOR environment variable")
+	return "", fmt.Errorf("no editor found. Please set WT_EDITOR, VISUAL, or EDITOR environment variable")
 }
 
 // Open opens the specified path with an editor

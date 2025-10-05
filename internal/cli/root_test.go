@@ -37,7 +37,7 @@ func TestShouldPassthrough(t *testing.T) {
 	}{
 		{
 			name:    "unknown command should passthrough",
-			errMsg:  "unknown command \"list\" for \"gwt\"",
+			errMsg:  "unknown command \"list\" for \"wt\"",
 			want:    true,
 		},
 		{

@@ -4,7 +4,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/toritsuyo/gwt/internal/gitx"
+	"github.com/toritsuyo/wt/internal/gitx"
 )
 
 func TestNoWorktreesError(t *testing.T) {

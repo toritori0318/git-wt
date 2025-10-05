@@ -6,16 +6,16 @@ import (
 	"os"
 
 	"github.com/spf13/cobra"
-	"github.com/toritsuyo/gwt/internal/config"
+	"github.com/toritsuyo/wt/internal/config"
 )
 
 func newConfigCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "config",
-		Short: "Manage gwt configuration",
-		Long: `Manage gwt configuration settings.
+		Short: "Manage wt configuration",
+		Long: `Manage wt configuration settings.
 
-Configuration file location: ~/.config/gwt/config.yaml
+Configuration file location: ~/.config/wt/config.yaml
 
 Available settings:
   worktree.directory_format     - "subdirectory" or "sibling"

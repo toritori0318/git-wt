@@ -1,21 +1,21 @@
-# gwt - Git worktree helper
-# Shell function: gwt go / any command --cd executes actual cd
+# wt - Git worktree helper
+# Shell function: wt go / any command --cd executes actual cd
 
-function gwt() {
+function wt() {
   if [[ "$1" == "go" ]]; then
     shift
     # Fast-path: delegate help/version directly to binary
     for arg in "$@"; do
       case "$arg" in
         -h|--help|help|--version)
-          command gwt go "$@"
+          command wt go "$@"
           return $?
           ;;
       esac
     done
 
     local out
-    out="$(command gwt go --quiet "$@")"
+    out="$(command wt go --quiet "$@")"
     local code=$?
 
     # If command failed, print output and return code
@@ -34,7 +34,7 @@ function gwt() {
   elif [[ "$*" == *"--cd"* ]]; then
     # If --cd flag exists, get path and cd
     local out
-    out="$(command gwt "$@")"
+    out="$(command wt "$@")"
     local code=$?
 
     if (( code != 0 )); then
@@ -49,12 +49,12 @@ function gwt() {
     fi
   else
     # Delegate other commands to binary
-    command gwt "$@"
+    command wt "$@"
   fi
 }
 
 # Zsh completion
-_gwt() {
+_wt() {
   local -a subcmds
   subcmds=(
     'new:Create new worktree'
@@ -67,7 +67,7 @@ _gwt() {
   )
 
   if (( CURRENT == 2 )); then
-    _describe 'gwt commands' subcmds
+    _describe 'wt commands' subcmds
   elif (( CURRENT == 3 )) && [[ "${words[2]}" == "go" ]]; then
     local -a branches
     branches=(${(f)"$(git worktree list --porcelain 2>/dev/null | grep '^branch' | awk '{print $2}' | sed 's|refs/heads/||')"})
@@ -75,4 +75,4 @@ _gwt() {
   fi
 }
 
-compdef _gwt gwt
+compdef _wt wt

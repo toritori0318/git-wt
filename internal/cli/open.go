@@ -5,8 +5,8 @@ import (
 	"io"
 
 	"github.com/spf13/cobra"
-	"github.com/toritsuyo/gwt/internal/editor"
-	"github.com/toritsuyo/gwt/internal/gitx"
+	"github.com/toritsuyo/wt/internal/editor"
+	"github.com/toritsuyo/wt/internal/gitx"
 )
 
 type openCmdConfig struct {
@@ -24,16 +24,16 @@ func newOpenCmd() *cobra.Command {
 If query is not specified, select interactively.
 Editor is determined by the following priority:
   1. --editor flag
-  2. GWT_EDITOR environment variable
+  2. WT_EDITOR environment variable
   3. VISUAL environment variable
   4. EDITOR environment variable
   5. code, idea, subl, vim, vi (in order of availability)
   6. macOS: open, Linux: xdg-open
 
 Examples:
-  gwt open                      # Select interactively and open with default editor
-  gwt open feature              # Open worktree containing "feature"
-  gwt open --editor code main   # Open main with VS Code`,
+  wt open                      # Select interactively and open with default editor
+  wt open feature              # Open worktree containing "feature"
+  wt open --editor code main   # Open main with VS Code`,
 		Args: cobra.MaximumNArgs(1),
 		RunE: func(c *cobra.Command, args []string) error {
 			return runOpenWithConfig(c, args, cfg)

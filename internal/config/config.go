@@ -164,5 +164,5 @@ func GetDefaultConfigPath() (string, error) {
 		configHome = filepath.Join(homeDir, ".config")
 	}
 
-	return filepath.Join(configHome, "gwt", "config.yaml"), nil
+	return filepath.Join(configHome, "wt", "config.yaml"), nil
 }

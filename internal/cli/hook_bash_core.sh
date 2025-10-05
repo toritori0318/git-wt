@@ -1,21 +1,21 @@
-# gwt - Git worktree helper
-# Shell function: gwt go / any command --cd executes actual cd
+# wt - Git worktree helper
+# Shell function: wt go / any command --cd executes actual cd
 
-function gwt() {
+function wt() {
   if [[ "$1" == "go" ]]; then
     shift
     # Fast-path: delegate help/version directly to binary
     for arg in "$@"; do
       case "$arg" in
         -h|--help|help|--version)
-          command gwt go "$@"
+          command wt go "$@"
           return $?
           ;;
       esac
     done
 
     local out
-    out="$(command gwt go --quiet "$@")"
+    out="$(command wt go --quiet "$@")"
     local code=$?
 
     # If command failed, print output and return code
@@ -34,7 +34,7 @@ function gwt() {
   elif [[ "$*" == *"--cd"* ]]; then
     # If --cd flag exists, get path and cd
     local out
-    out="$(command gwt "$@")"
+    out="$(command wt "$@")"
     local code=$?
 
     if (( code != 0 )); then
@@ -49,12 +49,12 @@ function gwt() {
     fi
   else
     # Delegate other commands to binary
-    command gwt "$@"
+    command wt "$@"
   fi
 }
 
 # Bash completion
-_gwt_completion() {
+_wt_completion() {
   local cur="${COMP_WORDS[COMP_CWORD]}"
   local prev="${COMP_WORDS[COMP_CWORD-1]}"
 
@@ -64,11 +64,11 @@ _gwt_completion() {
     return
   fi
 
-  # Complete branch names for gwt go
+  # Complete branch names for wt go
   if [[ "${COMP_WORDS[1]}" == "go" ]] && [[ $COMP_CWORD -eq 2 ]]; then
     local branches=$(git worktree list --porcelain 2>/dev/null | grep "^branch" | awk '{print $2}' | sed 's|refs/heads/||')
     COMPREPLY=($(compgen -W "$branches" -- "$cur"))
     return
   fi
 }
-complete -F _gwt_completion gwt
+complete -F _wt_completion wt

@@ -169,7 +169,7 @@ func TestRunHookWithConfig(t *testing.T) {
 			args:    []string{"bash"},
 			wantErr: false,
 			check: func(t *testing.T, output string) {
-				if !strings.Contains(output, "function gwt") && !strings.Contains(output, "gwt()") {
+				if !strings.Contains(output, "function wt") && !strings.Contains(output, "wt()") {
 					t.Errorf("output doesn't contain shell function definition")
 				}
 			},
@@ -179,7 +179,7 @@ func TestRunHookWithConfig(t *testing.T) {
 			args:    []string{"zsh"},
 			wantErr: false,
 			check: func(t *testing.T, output string) {
-				if !strings.Contains(output, "function gwt") && !strings.Contains(output, "gwt()") {
+				if !strings.Contains(output, "function wt") && !strings.Contains(output, "wt()") {
 					t.Errorf("output doesn't contain shell function definition")
 				}
 			},
@@ -189,7 +189,7 @@ func TestRunHookWithConfig(t *testing.T) {
 			args:    []string{"fish"},
 			wantErr: false,
 			check: func(t *testing.T, output string) {
-				if !strings.Contains(output, "function gwt") {
+				if !strings.Contains(output, "function wt") {
 					t.Errorf("output doesn't contain fish function definition")
 				}
 			},

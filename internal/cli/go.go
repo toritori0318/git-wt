@@ -5,8 +5,8 @@ import (
 	"io"
 
 	"github.com/spf13/cobra"
-	"github.com/toritsuyo/gwt/internal/gitx"
-	"github.com/toritsuyo/gwt/internal/selectx"
+	"github.com/toritsuyo/wt/internal/gitx"
+	"github.com/toritsuyo/wt/internal/selectx"
 )
 
 // NoWorktreesError represents an error when no worktrees are found
@@ -51,9 +51,9 @@ If query is not specified, select interactively (using fzf or numbered selection
 If query is specified, filter by partial match.
 
 Examples:
-  gwt go                    # Interactive selection
-  gwt go feature            # Select worktree containing "feature"
-  gwt go --quiet feature    # Output path only (for shell function)`,
+  wt go                    # Interactive selection
+  wt go feature            # Select worktree containing "feature"
+  wt go --quiet feature    # Output path only (for shell function)`,
 		Args: cobra.MaximumNArgs(1),
 		RunE: func(c *cobra.Command, args []string) error {
 			return runGoWithConfig(c, args, cfg)
@@ -196,6 +196,6 @@ func printGoResult(w io.Writer, selected *gitx.Worktree, query string, quiet boo
 	fmt.Fprintf(w, "Destination: %s\n", selected.Path)
 	fmt.Fprintf(w, "\nHint: To actually navigate, use shell function\n")
 	if query != "" {
-		fmt.Fprintf(w, "  gwt go %s\n", query)
+		fmt.Fprintf(w, "  wt go %s\n", query)
 	}
 }

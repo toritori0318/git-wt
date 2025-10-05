@@ -11,7 +11,7 @@ import (
 	"syscall"
 
 	"github.com/spf13/cobra"
-	"github.com/toritsuyo/gwt/internal/gitx"
+	"github.com/toritsuyo/wt/internal/gitx"
 )
 
 var (
@@ -44,9 +44,9 @@ func SetVersionInfo(version, commit, date string) {
 }
 
 var rootCmd = &cobra.Command{
-	Use:   "gwt",
+	Use:   "wt",
 	Short: "Git worktree helper CLI",
-	Long: `gwt is a CLI tool that wraps git worktree commands with conventions and shortcuts.
+	Long: `wt is a CLI tool that wraps git worktree commands with conventions and shortcuts.
 It manages worktrees in sibling directories with automatic naming conventions.`,
 	Version: "dev",
 	CompletionOptions: cobra.CompletionOptions{
@@ -96,11 +96,11 @@ Git Worktree Passthrough:
   Any unknown command will be passed through to 'git worktree'.
 
   Examples:
-    gwt list              -> git worktree list
-    gwt add <path> <ref>  -> git worktree add <path> <ref>
-    gwt remove <path>     -> git worktree remove <path>
-    gwt lock <path>       -> git worktree lock <path>
-    gwt prune             -> git worktree prune
+    wt list              -> git worktree list
+    wt add <path> <ref>  -> git worktree add <path> <ref>
+    wt remove <path>     -> git worktree remove <path>
+    wt lock <path>       -> git worktree lock <path>
+    wt prune             -> git worktree prune
 {{end}}`)
 
 	// Register subcommands

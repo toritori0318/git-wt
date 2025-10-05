@@ -1,33 +1,33 @@
 #!/bin/bash
-# gwt shell function (for bash/zsh)
+# wt shell function (for bash/zsh)
 #
 # Installation:
-#   1. Copy this file to ~/.gwt.sh
+#   1. Copy this file to ~/.wt.sh
 #   2. Add the following to ~/.bashrc or ~/.zshrc:
-#      source ~/.gwt.sh
+#      source ~/.wt.sh
 #   3. Restart shell: exec $SHELL
 #
-# Note: It's recommended to use `eval "$(gwt hook bash)"` or `eval "$(gwt hook zsh)"`
+# Note: It's recommended to use `eval "$(wt hook bash)"` or `eval "$(wt hook zsh)"`
 # instead of sourcing this file, as it ensures you always get the latest version.
 
-# gwt function
-# Acts as shell function for gwt go / any command with --cd to execute actual cd
+# wt function
+# Acts as shell function for wt go / any command with --cd to execute actual cd
 # Other commands are delegated to binary
-function gwt() {
+function wt() {
   if [[ "$1" == "go" ]]; then
     shift
     # Fast-path: delegate help/version directly to binary
     for arg in "$@"; do
       case "$arg" in
         -h|--help|help|--version)
-          command gwt go "$@"
+          command wt go "$@"
           return $?
           ;;
       esac
     done
 
     local out
-    out="$(command gwt go --quiet "$@")"
+    out="$(command wt go --quiet "$@")"
     local code=$?
 
     # If command failed, print output and return code
@@ -46,7 +46,7 @@ function gwt() {
   elif [[ "$*" == *"--cd"* ]]; then
     # If --cd flag exists, get path and cd
     local out
-    out="$(command gwt "$@")"
+    out="$(command wt "$@")"
     local code=$?
 
     if (( code != 0 )); then
@@ -61,14 +61,14 @@ function gwt() {
     fi
   else
     # Delegate other commands to binary
-    command gwt "$@"
+    command wt "$@"
   fi
 }
 
 # Completion configuration (optional)
 # For bash
 if [[ -n "$BASH_VERSION" ]]; then
-  _gwt_completion() {
+  _wt_completion() {
     local cur="${COMP_WORDS[COMP_CWORD]}"
     local prev="${COMP_WORDS[COMP_CWORD-1]}"
 
@@ -78,19 +78,19 @@ if [[ -n "$BASH_VERSION" ]]; then
       return
     fi
 
-    # Complete branch names for gwt go
+    # Complete branch names for wt go
     if [[ "${COMP_WORDS[1]}" == "go" ]] && [[ $COMP_CWORD -eq 2 ]]; then
       local branches=$(git worktree list --porcelain 2>/dev/null | grep "^branch" | awk '{print $2}' | sed 's|refs/heads/||')
       COMPREPLY=($(compgen -W "$branches" -- "$cur"))
       return
     fi
   }
-  complete -F _gwt_completion gwt
+  complete -F _wt_completion wt
 fi
 
 # For zsh
 if [[ -n "$ZSH_VERSION" ]]; then
-  _gwt() {
+  _wt() {
     local -a subcmds
     subcmds=(
       'new:Create new worktree'
@@ -103,7 +103,7 @@ if [[ -n "$ZSH_VERSION" ]]; then
     )
 
     if (( CURRENT == 2 )); then
-      _describe 'gwt commands' subcmds
+      _describe 'wt commands' subcmds
     elif (( CURRENT == 3 )) && [[ "${words[2]}" == "go" ]]; then
       local -a branches
       branches=(${(f)"$(git worktree list --porcelain 2>/dev/null | grep '^branch' | awk '{print $2}' | sed 's|refs/heads/||')"})
@@ -111,5 +111,5 @@ if [[ -n "$ZSH_VERSION" ]]; then
     fi
   }
 
-  compdef _gwt gwt
+  compdef _wt wt
 fi

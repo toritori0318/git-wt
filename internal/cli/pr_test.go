@@ -127,13 +127,13 @@ func TestDetermineLocalBranch(t *testing.T) {
 			name:       "default branch name",
 			userBranch: "",
 			prNumber:   456,
-			want:       "gwt/pr-456",
+			want:       "wt/pr-456",
 		},
 		{
 			name:       "user empty string uses default",
 			userBranch: "",
 			prNumber:   1,
-			want:       "gwt/pr-1",
+			want:       "wt/pr-1",
 		},
 	}
 

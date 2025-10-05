@@ -6,9 +6,9 @@ import (
 	"strconv"
 
 	"github.com/spf13/cobra"
-	"github.com/toritsuyo/gwt/internal/ghx"
-	"github.com/toritsuyo/gwt/internal/gitx"
-	"github.com/toritsuyo/gwt/internal/naming"
+	"github.com/toritsuyo/wt/internal/ghx"
+	"github.com/toritsuyo/wt/internal/gitx"
+	"github.com/toritsuyo/wt/internal/naming"
 )
 
 // GhNotFoundError represents an error when GitHub CLI is not found
@@ -49,16 +49,16 @@ Prerequisites:
   - Must be authenticated with gh auth login
 
 Examples:
-  gwt pr 123                          # Review PR #123
-  gwt pr 123 --branch review/pr-123   # Specify local branch name
-  gwt pr 123 --cd                     # Move immediately after creation`,
+  wt pr 123                          # Review PR #123
+  wt pr 123 --branch review/pr-123   # Specify local branch name
+  wt pr 123 --cd                     # Move immediately after creation`,
 		Args: cobra.ExactArgs(1),
 		RunE: func(c *cobra.Command, args []string) error {
 			return runPRWithConfig(c, args, cfg)
 		},
 	}
 
-	cmd.Flags().StringVar(&cfg.branch, "branch", "", "Local branch name (default: gwt/pr-<num>)")
+	cmd.Flags().StringVar(&cfg.branch, "branch", "", "Local branch name (default: wt/pr-<num>)")
 	cmd.Flags().StringVar(&cfg.remote, "remote", "", "Remote name (default: auto-detect)")
 	cmd.Flags().BoolVar(&cfg.cd, "cd", false, "Output only worktree path (for shell function)")
 
@@ -164,7 +164,7 @@ func determineLocalBranch(userBranch string, prNumber int) string {
 	if userBranch != "" {
 		return userBranch
 	}
-	return fmt.Sprintf("gwt/pr-%d", prNumber)
+	return fmt.Sprintf("wt/pr-%d", prNumber)
 }
 
 func determineRemote(w io.Writer, userRemote string, prInfo *ghx.PRInfo, prNumber int, cdMode, quiet bool) (remote, tempRemote string, err error) {
@@ -175,7 +175,7 @@ func determineRemote(w io.Writer, userRemote string, prInfo *ghx.PRInfo, prNumbe
 	if prInfo.IsCrossRepository {
 		// For fork PRs, add temporary remote if needed
 		if !ghx.RemoteExists(prInfo.HeadOwner) {
-			tempRemote = fmt.Sprintf("gwt-pr-%d", prNumber)
+			tempRemote = fmt.Sprintf("wt-pr-%d", prNumber)
 			printPRProgress(w, "Adding temporary remote: %s (%s/%s)\n", tempRemote, prInfo.HeadOwner, prInfo.HeadRepo, cdMode, quiet)
 			if err := ghx.AddRemote(tempRemote, prInfo.HeadOwner, prInfo.HeadRepo); err != nil {
 				return "", "", fmt.Errorf("failed to add temporary remote: %w", err)
@@ -230,5 +230,5 @@ func printPRSuccess(w io.Writer, worktreePath string, prNumber int, localBranch 
 	fmt.Fprintf(w, "  Branch: %s\n", localBranch)
 	fmt.Fprintf(w, "  Path: %s\n", worktreePath)
 	fmt.Fprintf(w, "\nNavigate: cd %s\n", worktreePath)
-	fmt.Fprintf(w, "Or: gwt go pr-%d\n", prNumber)
+	fmt.Fprintf(w, "Or: wt go pr-%d\n", prNumber)
 }

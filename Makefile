@@ -1,7 +1,7 @@
 .PHONY: build install clean test help
 
 # Binary name
-BINARY_NAME=gwt
+BINARY_NAME=wt
 
 # Build directory
 BUILD_DIR=.
@@ -16,11 +16,11 @@ GOMOD=$(GOCMD) mod
 
 # Build the project
 build:
-	$(GOBUILD) -buildvcs=false -o $(BUILD_DIR)/$(BINARY_NAME) ./cmd/gwt
+	$(GOBUILD) -buildvcs=false -o $(BUILD_DIR)/$(BINARY_NAME) ./cmd/wt
 
 # Install to $GOPATH/bin
 install:
-	$(GOCMD) install ./cmd/gwt
+	$(GOCMD) install ./cmd/wt
 
 # Clean build files
 clean:
@@ -40,14 +40,14 @@ deps:
 build-all: build-linux build-darwin build-windows
 
 build-linux:
-	GOOS=linux GOARCH=amd64 $(GOBUILD) -buildvcs=false -o $(BUILD_DIR)/$(BINARY_NAME)-linux-amd64 ./cmd/gwt
+	GOOS=linux GOARCH=amd64 $(GOBUILD) -buildvcs=false -o $(BUILD_DIR)/$(BINARY_NAME)-linux-amd64 ./cmd/wt
 
 build-darwin:
-	GOOS=darwin GOARCH=amd64 $(GOBUILD) -buildvcs=false -o $(BUILD_DIR)/$(BINARY_NAME)-darwin-amd64 ./cmd/gwt
-	GOOS=darwin GOARCH=arm64 $(GOBUILD) -buildvcs=false -o $(BUILD_DIR)/$(BINARY_NAME)-darwin-arm64 ./cmd/gwt
+	GOOS=darwin GOARCH=amd64 $(GOBUILD) -buildvcs=false -o $(BUILD_DIR)/$(BINARY_NAME)-darwin-amd64 ./cmd/wt
+	GOOS=darwin GOARCH=arm64 $(GOBUILD) -buildvcs=false -o $(BUILD_DIR)/$(BINARY_NAME)-darwin-arm64 ./cmd/wt
 
 build-windows:
-	GOOS=windows GOARCH=amd64 $(GOBUILD) -buildvcs=false -o $(BUILD_DIR)/$(BINARY_NAME)-windows-amd64.exe ./cmd/gwt
+	GOOS=windows GOARCH=amd64 $(GOBUILD) -buildvcs=false -o $(BUILD_DIR)/$(BINARY_NAME)-windows-amd64.exe ./cmd/wt
 
 # Show help
 help:

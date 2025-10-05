@@ -3,7 +3,7 @@
 ## Configuration File Location
 
 ```
-~/.config/gwt/config.yaml
+~/.config/wt/config.yaml
 ```
 
 The configuration file follows the XDG Base Directory specification. If the `XDG_CONFIG_HOME` environment variable is set, that directory will be used.
@@ -12,16 +12,16 @@ The configuration file follows the XDG Base Directory specification. If the `XDG
 
 ```bash
 # Display current settings
-gwt config list
+wt config list
 
 # Get a specific setting value
-gwt config get worktree.directory_format
+wt config get worktree.directory_format
 
 # Change a setting value
-gwt config set worktree.directory_format sibling
+wt config set worktree.directory_format sibling
 
 # Reset to defaults
-gwt config reset
+wt config reset
 ```
 
 ## Configuration Options
@@ -82,17 +82,17 @@ work/
 
 ```bash
 # Use default suffix (-wt)
-gwt new feature/login
+wt new feature/login
 # → Creates ~/work/myproject-wt/feature-login
 
 # Set custom suffix
-gwt config set worktree.subdirectory_suffix -worktrees
-gwt new feature/login
+wt config set worktree.subdirectory_suffix -worktrees
+wt new feature/login
 # → Creates ~/work/myproject-worktrees/feature-login
 
 # Another custom suffix
-gwt config set worktree.subdirectory_suffix -branches
-gwt new develop
+wt config set worktree.subdirectory_suffix -branches
+wt new develop
 # → Creates ~/work/myproject-branches/develop
 ```
 
@@ -134,12 +134,12 @@ work/
 
 ```bash
 # Switch to sibling mode
-gwt config set worktree.directory_format sibling
+wt config set worktree.directory_format sibling
 
-gwt new feature/login
+wt new feature/login
 # → Creates ~/work/myproject-feature-login
 
-gwt new develop
+wt new develop
 # → Creates ~/work/myproject-develop
 ```
 
@@ -149,21 +149,21 @@ gwt new develop
 
 ```bash
 # Reset to default settings
-gwt config reset
+wt config reset
 
 # Or explicitly set
-gwt config set worktree.directory_format subdirectory
+wt config set worktree.directory_format subdirectory
 ```
 
 ### Switch to Sibling Mode (Legacy)
 
 ```bash
-gwt config set worktree.directory_format sibling
+wt config set worktree.directory_format sibling
 ```
 
 ## Manual Configuration File Editing
 
-You can also edit the configuration file (`~/.config/gwt/config.yaml`) directly.
+You can also edit the configuration file (`~/.config/wt/config.yaml`) directly.
 
 **Example configuration file:**
 
@@ -216,14 +216,14 @@ Choose a suffix that's short and clearly distinguishes from the project name:
 
 ```bash
 # Check configuration file path
-gwt config list
-# → Configuration file: /Users/username/.config/gwt/config.yaml (not found (using defaults))
+wt config list
+# → Configuration file: /Users/username/.config/wt/config.yaml (not found (using defaults))
 ```
 
 The file is automatically created when you change a setting:
 
 ```bash
-gwt config set worktree.directory_format subdirectory
+wt config set worktree.directory_format subdirectory
 # → File is created
 ```
 
@@ -233,10 +233,10 @@ Verify that the YAML syntax in the configuration file is correct:
 
 ```bash
 # Check current settings
-gwt config list
+wt config list
 
 # Reset if there are issues
-gwt config reset
+wt config reset
 ```
 
 ### Setting Values That Start with a Hyphen
@@ -245,11 +245,11 @@ gwt config reset
 
 ```bash
 # Correct
-gwt config set worktree.subdirectory_suffix -wt
-gwt config set worktree.subdirectory_suffix -worktrees
+wt config set worktree.subdirectory_suffix -wt
+wt config set worktree.subdirectory_suffix -worktrees
 
 # Error (no hyphen)
-gwt config set worktree.subdirectory_suffix wt
+wt config set worktree.subdirectory_suffix wt
 # → Error: subdirectory_suffix must start with '-'
 ```
 

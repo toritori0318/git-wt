@@ -47,22 +47,22 @@ func newHookCmd() *cobra.Command {
 		Short: "Output shell hook scripts",
 		Long: `Output shell hook scripts to stdout.
 
-To enable actual directory navigation with gwt go command,
+To enable actual directory navigation with wt go command,
 this script must be added to your shell configuration file.
 
 Supported shells: bash, zsh, fish
 
 Examples:
   # Bash
-  gwt hook bash >> ~/.bashrc
+  wt hook bash >> ~/.bashrc
   source ~/.bashrc
 
   # Zsh
-  gwt hook zsh >> ~/.zshrc
+  wt hook zsh >> ~/.zshrc
   source ~/.zshrc
 
   # Fish
-  gwt hook fish > ~/.config/fish/functions/gwt.fish
+  wt hook fish > ~/.config/fish/functions/wt.fish
   exec fish`,
 		Args: cobra.ExactArgs(1),
 		ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {

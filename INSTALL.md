@@ -1,4 +1,4 @@
-# gwt Installation Guide
+# wt Installation Guide
 
 ## Installation Steps
 
@@ -7,42 +7,42 @@
 Install via Go:
 
 ```bash
-go install github.com/toritsuyo/gwt@latest
+go install github.com/toritsuyo/wt@latest
 ```
 
 Or build from source:
 
 ```bash
-git clone https://github.com/toritsuyo/gwt.git
-cd gwt
-go build -o gwt ./cmd/gwt
-sudo mv gwt /usr/local/bin/
+git clone https://github.com/toritsuyo/wt.git
+cd wt
+go build -o wt ./cmd/wt
+sudo mv wt /usr/local/bin/
 ```
 
 ### 2. Setup Shell Function (Required)
 
-To enable directory navigation with `gwt go`, add shell function to your configuration.
+To enable directory navigation with `wt go`, add shell function to your configuration.
 
 This setup dynamically loads the latest shell function from the binary, so updates are automatically reflected.
 
 #### Bash
 
 ```bash
-echo 'eval "$(gwt hook bash)"' >> ~/.bashrc
+echo 'eval "$(wt hook bash)"' >> ~/.bashrc
 source ~/.bashrc
 ```
 
 #### Zsh
 
 ```bash
-echo 'eval "$(gwt hook zsh)"' >> ~/.zshrc
+echo 'eval "$(wt hook zsh)"' >> ~/.zshrc
 source ~/.zshrc
 ```
 
 #### Fish
 
 ```bash
-echo 'gwt hook fish | source' >> ~/.config/fish/config.fish
+echo 'wt hook fish | source' >> ~/.config/fish/config.fish
 exec fish
 ```
 
@@ -52,23 +52,23 @@ exec fish
 
 ```bash
 # Display help
-gwt --help
+wt --help
 
 # Check version (verify it's installed in GOPATH)
-which gwt
+which wt
 ```
 
 ### Check Shell Function
 
 ```bash
 # Verify shell function is loaded
-type gwt
+type wt
 
 # Expected output:
-# gwt is a function
-# gwt () { ... }
+# wt is a function
+# wt () { ... }
 
-# If it displays "gwt is /path/to/gwt",
+# If it displays "wt is /path/to/wt",
 # the shell function is not loaded correctly
 ```
 
@@ -82,13 +82,13 @@ cd /path/to/your/git/repo
 git worktree list
 
 # Create a new worktree
-gwt new feature/test
+wt new feature/test
 
 # Verify worktree
 git worktree list
 
 # Try navigating (if shell function is working, it will actually cd)
-gwt go feature
+wt go feature
 
 # Check current location
 pwd
@@ -99,7 +99,7 @@ pwd
 
 ### fzf (Recommended)
 
-Installing fzf enables a comfortable selection UI for `gwt go`/`gwt clean`/`gwt open`.
+Installing fzf enables a comfortable selection UI for `wt go`/`wt clean`/`wt open`.
 
 Works without it (falls back to numbered selection UI), but installation is recommended.
 
@@ -115,9 +115,9 @@ git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
 ~/.fzf/install
 ```
 
-### GitHub CLI (for `gwt pr`)
+### GitHub CLI (for `wt pr`)
 
-Only required if using the PR review feature (`gwt pr`).
+Only required if using the PR review feature (`wt pr`).
 
 ```bash
 # macOS
@@ -137,10 +137,10 @@ gh auth login
 
 ## 7. Editor Configuration (Optional)
 
-The editor used by `gwt open` is determined in the following order:
+The editor used by `wt open` is determined in the following order:
 
 1. `--editor` flag
-2. `GWT_EDITOR` environment variable
+2. `WT_EDITOR` environment variable
 3. `VISUAL` environment variable
 4. `EDITOR` environment variable
 5. Auto-detection (code, idea, subl, vim, vi)
@@ -149,7 +149,7 @@ To set your preferred editor:
 
 ```bash
 # Add to .bashrc / .zshrc
-export GWT_EDITOR=code
+export WT_EDITOR=code
 # or
 export EDITOR=vim
 ```
@@ -162,18 +162,18 @@ If you built from source and want to use the local binary:
 
 ```bash
 # Bash
-cd /path/to/gwt
-echo 'eval "$(./gwt hook bash)"' >> ~/.bashrc
+cd /path/to/wt
+echo 'eval "$(./wt hook bash)"' >> ~/.bashrc
 source ~/.bashrc
 
 # Zsh
-cd /path/to/gwt
-echo 'eval "$(./gwt hook zsh)"' >> ~/.zshrc
+cd /path/to/wt
+echo 'eval "$(./wt hook zsh)"' >> ~/.zshrc
 source ~/.zshrc
 
 # Fish
-cd /path/to/gwt
-echo './gwt hook fish | source' >> ~/.config/fish/config.fish
+cd /path/to/wt
+echo './wt hook fish | source' >> ~/.config/fish/config.fish
 exec fish
 ```
 
@@ -183,23 +183,23 @@ You can also use static shell function files, but they won't auto-update when th
 
 ```bash
 # Bash/Zsh - Download and source
-mkdir -p ~/.gwt
-curl -fsSL https://raw.githubusercontent.com/toritsuyo/gwt/main/shell/gwt.sh -o ~/.gwt/gwt.sh
-echo 'source ~/.gwt/gwt.sh' >> ~/.zshrc
+mkdir -p ~/.wt
+curl -fsSL https://raw.githubusercontent.com/toritsuyo/wt/main/shell/wt.sh -o ~/.wt/wt.sh
+echo 'source ~/.wt/wt.sh' >> ~/.zshrc
 source ~/.zshrc
 
 # Fish - Download to functions directory
 mkdir -p ~/.config/fish/functions
-curl -fsSL https://raw.githubusercontent.com/toritsuyo/gwt/main/shell/gwt.fish \
-  -o ~/.config/fish/functions/gwt.fish
+curl -fsSL https://raw.githubusercontent.com/toritsuyo/wt/main/shell/wt.fish \
+  -o ~/.config/fish/functions/wt.fish
 exec fish
 ```
 
-**Note:** Using `eval "$(gwt hook <shell>)"` is recommended as it automatically reflects updates.
+**Note:** Using `eval "$(wt hook <shell>)"` is recommended as it automatically reflects updates.
 
 ## 6. Troubleshooting
 
-### `gwt: command not found`
+### `wt: command not found`
 
 **Cause:** `$GOPATH/bin` is not in PATH
 
@@ -217,20 +217,20 @@ echo 'export PATH="$PATH:$(go env GOPATH)/bin"' >> ~/.zshrc
 source ~/.zshrc
 ```
 
-### Can't navigate with `gwt go`
+### Can't navigate with `wt go`
 
 **Cause:** Shell function is not loaded
 
 **How to Check:**
 
 ```bash
-type gwt
+type wt
 
 # Expected output:
-# gwt is a function
+# wt is a function
 
 # If it displays like this, shell function is not set:
-# gwt is /Users/xxx/go/bin/gwt
+# wt is /Users/xxx/go/bin/wt
 ```
 
 **Solution:**
@@ -251,7 +251,7 @@ brew install git
 sudo apt install git
 ```
 
-### `gh: command not found` (when using gwt pr)
+### `gh: command not found` (when using wt pr)
 
 **Solution:** See "4. Install Optional Dependencies - GitHub CLI"
 
@@ -264,20 +264,20 @@ Installing fzf improves the experience (see "4. Install Optional Dependencies - 
 
 ```bash
 # Remove binary
-rm /usr/local/bin/gwt
+rm /usr/local/bin/wt
 
 # Remove shell function configuration
-# Edit your shell config file and remove the eval "$(gwt hook ...)" line:
+# Edit your shell config file and remove the eval "$(wt hook ...)" line:
 # - ~/.bashrc or ~/.bash_profile (Bash)
 # - ~/.zshrc (Zsh)
 # - ~/.config/fish/config.fish (Fish)
 
 # If using static shell function files, also remove:
-rm ~/.gwt.sh  # Bash/Zsh
-rm ~/.config/fish/functions/gwt.fish  # Fish
+rm ~/.wt.sh  # Bash/Zsh
+rm ~/.config/fish/functions/wt.fish  # Fish
 ```
 
 ## Support
 
 If you encounter issues, please report them on GitHub Issues:
-https://github.com/toritsuyo/gwt/issues
+https://github.com/toritsuyo/wt/issues
