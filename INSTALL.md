@@ -7,13 +7,13 @@
 Install via Go:
 
 ```bash
-go install github.com/toritsuyo/wt@latest
+go install github.com/toritori0318/git-wt@latest
 ```
 
 Or build from source:
 
 ```bash
-git clone https://github.com/toritsuyo/wt.git
+git clone https://github.com/toritori0318/git-wt.git
 cd wt
 go build -o wt ./cmd/wt
 sudo mv wt /usr/local/bin/
@@ -184,13 +184,13 @@ You can also use static shell function files, but they won't auto-update when th
 ```bash
 # Bash/Zsh - Download and source
 mkdir -p ~/.wt
-curl -fsSL https://raw.githubusercontent.com/toritsuyo/wt/main/shell/wt.sh -o ~/.wt/wt.sh
+curl -fsSL https://raw.githubusercontent.com/toritori0318/git-wt/main/shell/wt.sh -o ~/.wt/wt.sh
 echo 'source ~/.wt/wt.sh' >> ~/.zshrc
 source ~/.zshrc
 
 # Fish - Download to functions directory
 mkdir -p ~/.config/fish/functions
-curl -fsSL https://raw.githubusercontent.com/toritsuyo/wt/main/shell/wt.fish \
+curl -fsSL https://raw.githubusercontent.com/toritori0318/git-wt/main/shell/wt.fish \
   -o ~/.config/fish/functions/wt.fish
 exec fish
 ```
@@ -280,4 +280,4 @@ rm ~/.config/fish/functions/wt.fish  # Fish
 ## Support
 
 If you encounter issues, please report them on GitHub Issues:
-https://github.com/toritsuyo/wt/issues
+https://github.com/toritori0318/git-wt/issues

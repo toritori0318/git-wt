@@ -5,8 +5,8 @@ import (
 	"io"
 
 	"github.com/spf13/cobra"
-	"github.com/toritsuyo/wt/internal/gitx"
-	"github.com/toritsuyo/wt/internal/selectx"
+	"github.com/toritori0318/git-wt/internal/gitx"
+	"github.com/toritori0318/git-wt/internal/selectx"
 )
 
 // NoWorktreesError represents an error when no worktrees are found

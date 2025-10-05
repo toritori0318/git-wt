@@ -3,7 +3,7 @@ package cli
 import (
 	"testing"
 
-	"github.com/toritsuyo/wt/internal/naming"
+	"github.com/toritori0318/git-wt/internal/naming"
 )
 
 func TestSessionNameSanitization(t *testing.T) {

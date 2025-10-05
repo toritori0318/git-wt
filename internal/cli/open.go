@@ -5,8 +5,8 @@ import (
 	"io"
 
 	"github.com/spf13/cobra"
-	"github.com/toritsuyo/wt/internal/editor"
-	"github.com/toritsuyo/wt/internal/gitx"
+	"github.com/toritori0318/git-wt/internal/editor"
+	"github.com/toritori0318/git-wt/internal/gitx"
 )
 
 type openCmdConfig struct {

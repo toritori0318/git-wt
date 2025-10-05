@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/toritsuyo/wt/internal/config"
+	"github.com/toritori0318/git-wt/internal/config"
 )
 
 // テストリスト（網羅したいテストシナリオ）

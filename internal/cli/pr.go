@@ -6,9 +6,9 @@ import (
 	"strconv"
 
 	"github.com/spf13/cobra"
-	"github.com/toritsuyo/wt/internal/ghx"
-	"github.com/toritsuyo/wt/internal/gitx"
-	"github.com/toritsuyo/wt/internal/naming"
+	"github.com/toritori0318/git-wt/internal/ghx"
+	"github.com/toritori0318/git-wt/internal/gitx"
+	"github.com/toritori0318/git-wt/internal/naming"
 )
 
 // GhNotFoundError represents an error when GitHub CLI is not found

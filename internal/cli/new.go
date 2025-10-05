@@ -8,8 +8,8 @@ import (
 	"strings"
 
 	"github.com/spf13/cobra"
-	"github.com/toritsuyo/wt/internal/gitx"
-	"github.com/toritsuyo/wt/internal/naming"
+	"github.com/toritori0318/git-wt/internal/gitx"
+	"github.com/toritori0318/git-wt/internal/naming"
 )
 
 // BranchInUseError represents an error when a branch is already in use

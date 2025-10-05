@@ -11,7 +11,7 @@ import (
 	"syscall"
 
 	"github.com/spf13/cobra"
-	"github.com/toritsuyo/wt/internal/gitx"
+	"github.com/toritori0318/git-wt/internal/gitx"
 )
 
 var (

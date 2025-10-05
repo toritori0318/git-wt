@@ -5,8 +5,8 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/toritsuyo/wt/internal/config"
-	"github.com/toritsuyo/wt/internal/naming"
+	"github.com/toritori0318/git-wt/internal/config"
+	"github.com/toritori0318/git-wt/internal/naming"
 )
 
 // テストリスト（網羅したいテストシナリオ）

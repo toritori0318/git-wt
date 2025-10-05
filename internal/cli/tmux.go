@@ -5,9 +5,9 @@ import (
 	"fmt"
 
 	"github.com/spf13/cobra"
-	"github.com/toritsuyo/wt/internal/gitx"
-	"github.com/toritsuyo/wt/internal/naming"
-	"github.com/toritsuyo/wt/internal/tmux"
+	"github.com/toritori0318/git-wt/internal/gitx"
+	"github.com/toritori0318/git-wt/internal/naming"
+	"github.com/toritori0318/git-wt/internal/tmux"
 )
 
 type tmuxNewConfig struct {

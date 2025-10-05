@@ -1,4 +1,4 @@
-module github.com/toritsuyo/wt
+module github.com/toritori0318/git-wt
 
 go 1.24.5
 

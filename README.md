@@ -39,10 +39,10 @@ wt new feature/login  # Creates myproject-wt/feature-login and navigates automat
 
 ```bash
 # Option A: Install via Go (recommended)
-go install github.com/toritsuyo/wt@latest
+go install github.com/toritori0318/git-wt@latest
 
 # Option B: Build from source
-git clone https://github.com/toritsuyo/wt.git
+git clone https://github.com/toritori0318/git-wt.git
 cd wt
 go build -o wt ./cmd/wt
 sudo mv wt /usr/local/bin/

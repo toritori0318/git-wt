@@ -5,7 +5,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/toritsuyo/wt/internal/config"
+	"github.com/toritori0318/git-wt/internal/config"
 )
 
 // GenerateWorktreePath generates a unique worktree path using default configuration

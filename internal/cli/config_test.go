@@ -7,7 +7,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/toritsuyo/wt/internal/config"
+	"github.com/toritori0318/git-wt/internal/config"
 )
 
 // テストリスト
