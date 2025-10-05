@@ -7,15 +7,15 @@
 Install via Go:
 
 ```bash
-go install github.com/toritori0318/git-wt@latest
+go install github.com/toritori0318/git-wt/cmd/wt@latest
 ```
 
 Or build from source:
 
 ```bash
 git clone https://github.com/toritori0318/git-wt.git
-cd wt
-go build -o wt ./cmd/wt
+cd git-wt
+make build
 sudo mv wt /usr/local/bin/
 ```
 
