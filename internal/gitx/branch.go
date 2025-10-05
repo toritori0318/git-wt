@@ -6,6 +6,15 @@ import (
 	"strings"
 )
 
+// GetCurrentBranch returns the current branch name
+func GetCurrentBranch(ctx context.Context) (string, error) {
+	branch, err := RunGit(ctx, "rev-parse", "--abbrev-ref", "HEAD")
+	if err != nil {
+		return "", fmt.Errorf("failed to get current branch: %w", err)
+	}
+	return strings.TrimSpace(branch), nil
+}
+
 // BranchExists checks if a branch exists locally
 func BranchExists(ctx context.Context, branch string) (bool, error) {
 	ref := fmt.Sprintf("refs/heads/%s", branch)
