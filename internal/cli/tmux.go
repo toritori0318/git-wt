@@ -70,6 +70,30 @@ func init() {
 	rootCmd.AddCommand(tmuxCmd)
 }
 
+func validateLayout(layout string) error {
+	if layout == "" {
+		return nil // Empty is allowed (uses tmux default)
+	}
+
+	validLayouts := []string{
+		"tiled",
+		"horizontal",
+		"vertical",
+		"even-horizontal",
+		"even-vertical",
+		"main-horizontal",
+		"main-vertical",
+	}
+
+	for _, valid := range validLayouts {
+		if layout == valid {
+			return nil
+		}
+	}
+
+	return fmt.Errorf("invalid layout: %s (must be one of: %s)", layout, "tiled, horizontal, vertical, even-horizontal, even-vertical, main-horizontal, main-vertical")
+}
+
 func runTmuxNew(cmd *cobra.Command, args []string, cfg *tmuxNewConfig) error {
 	ctx := cmd.Context()
 	w := cmd.OutOrStdout()
@@ -88,6 +112,11 @@ func runTmuxNew(cmd *cobra.Command, args []string, cfg *tmuxNewConfig) error {
 	// Check tmux availability
 	if !tmux.IsTmuxAvailable() {
 		return fmt.Errorf("tmux is not installed. Install with: brew install tmux (macOS) or apt install tmux (Linux)")
+	}
+
+	// Validate layout
+	if err := validateLayout(cfg.layout); err != nil {
+		return err
 	}
 
 	// Validate count
@@ -119,6 +148,9 @@ func runTmuxNew(cmd *cobra.Command, args []string, cfg *tmuxNewConfig) error {
 	if tmuxName == "" {
 		// Generate session name from branch prefix
 		tmuxName = fmt.Sprintf("gwt-%s-%s", repo.Name, naming.Sanitize(branchPrefix))
+	} else {
+		// Sanitize user-specified session name to prevent command injection
+		tmuxName = naming.Sanitize(tmuxName)
 	}
 
 	tm := tmux.NewManager(tmuxName)
@@ -137,6 +169,7 @@ func runTmuxNew(cmd *cobra.Command, args []string, cfg *tmuxNewConfig) error {
 		Layout:      cfg.layout,
 		SyncPanes:   cfg.syncPanes,
 		NoAttach:    cfg.noAttach,
+		Debug:       flagDebug,
 	}
 
 	if err := tm.CreateSession(tmuxCfg); err != nil {

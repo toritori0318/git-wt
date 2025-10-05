@@ -84,6 +84,31 @@ func (c *Config) Validate() error {
 		return fmt.Errorf("invalid directory_format: %q (must be %q or %q)",
 			format, DirectoryFormatSubdirectory, DirectoryFormatSibling)
 	}
+
+	// Validate subdirectory suffix starts with hyphen
+	suffix := c.Worktree.SubdirectorySuffix
+	if suffix != "" && suffix[0] != '-' {
+		return fmt.Errorf("subdirectory_suffix must start with '-', got %q", suffix)
+	}
+
+	return nil
+}
+
+// SetDirectoryFormat sets and validates the directory format
+func (c *Config) SetDirectoryFormat(format string) error {
+	if format != DirectoryFormatSubdirectory && format != DirectoryFormatSibling {
+		return fmt.Errorf("invalid value for directory_format: %s (must be 'subdirectory' or 'sibling')", format)
+	}
+	c.Worktree.DirectoryFormat = format
+	return nil
+}
+
+// SetSubdirectorySuffix sets and validates the subdirectory suffix
+func (c *Config) SetSubdirectorySuffix(suffix string) error {
+	if suffix != "" && suffix[0] != '-' {
+		return fmt.Errorf("subdirectory_suffix must start with '-'")
+	}
+	c.Worktree.SubdirectorySuffix = suffix
 	return nil
 }
 

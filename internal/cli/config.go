@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"strings"
 
 	"github.com/spf13/cobra"
 	"github.com/toritsuyo/gwt/internal/config"
@@ -186,19 +185,12 @@ func getConfigValue(cfg *config.Config, key string) (string, error) {
 func setConfigValue(cfg *config.Config, key, value string) error {
 	switch key {
 	case "worktree.directory_format":
-		if value != config.DirectoryFormatSubdirectory && value != config.DirectoryFormatSibling {
-			return fmt.Errorf("invalid value for directory_format: %s (must be 'subdirectory' or 'sibling')", value)
-		}
-		cfg.Worktree.DirectoryFormat = value
+		return cfg.SetDirectoryFormat(value)
 	case "worktree.subdirectory_suffix":
-		if !strings.HasPrefix(value, "-") {
-			return fmt.Errorf("subdirectory_suffix must start with '-'")
-		}
-		cfg.Worktree.SubdirectorySuffix = value
+		return cfg.SetSubdirectorySuffix(value)
 	default:
 		return fmt.Errorf("unknown config key: %s", key)
 	}
-	return nil
 }
 
 var configCmd = newConfigCmd()

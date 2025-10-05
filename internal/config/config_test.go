@@ -214,3 +214,163 @@ func TestResetNonexistentConfig(t *testing.T) {
 		t.Fatalf("Reset() returned error for non-existent file: %v", err)
 	}
 }
+
+func TestValidate(t *testing.T) {
+	tests := []struct {
+		name   string
+		config config.Config
+		wantErr bool
+	}{
+		{
+			name: "valid subdirectory format",
+			config: config.Config{
+				Worktree: config.WorktreeConfig{
+					DirectoryFormat:    config.DirectoryFormatSubdirectory,
+					SubdirectorySuffix: "-wt",
+				},
+			},
+			wantErr: false,
+		},
+		{
+			name: "valid sibling format",
+			config: config.Config{
+				Worktree: config.WorktreeConfig{
+					DirectoryFormat:    config.DirectoryFormatSibling,
+					SubdirectorySuffix: "-wt",
+				},
+			},
+			wantErr: false,
+		},
+		{
+			name: "invalid directory format",
+			config: config.Config{
+				Worktree: config.WorktreeConfig{
+					DirectoryFormat: "invalid",
+				},
+			},
+			wantErr: true,
+		},
+		{
+			name: "invalid subdirectory suffix (no hyphen)",
+			config: config.Config{
+				Worktree: config.WorktreeConfig{
+					DirectoryFormat:    config.DirectoryFormatSubdirectory,
+					SubdirectorySuffix: "wt",
+				},
+			},
+			wantErr: true,
+		},
+		{
+			name: "empty subdirectory suffix is valid",
+			config: config.Config{
+				Worktree: config.WorktreeConfig{
+					DirectoryFormat:    config.DirectoryFormatSubdirectory,
+					SubdirectorySuffix: "",
+				},
+			},
+			wantErr: false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := tt.config.Validate()
+			if (err != nil) != tt.wantErr {
+				t.Errorf("Validate() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
+func TestSetDirectoryFormat(t *testing.T) {
+	tests := []struct {
+		name    string
+		value   string
+		wantErr bool
+	}{
+		{
+			name:    "valid subdirectory",
+			value:   config.DirectoryFormatSubdirectory,
+			wantErr: false,
+		},
+		{
+			name:    "valid sibling",
+			value:   config.DirectoryFormatSibling,
+			wantErr: false,
+		},
+		{
+			name:    "invalid format",
+			value:   "invalid",
+			wantErr: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			cfg := &config.Config{
+				Worktree: config.WorktreeConfig{
+					DirectoryFormat:    config.DefaultDirectoryFormat,
+					SubdirectorySuffix: config.DefaultSubdirectorySuffix,
+				},
+			}
+
+			err := cfg.SetDirectoryFormat(tt.value)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("SetDirectoryFormat() error = %v, wantErr %v", err, tt.wantErr)
+			}
+
+			if !tt.wantErr && cfg.Worktree.DirectoryFormat != tt.value {
+				t.Errorf("DirectoryFormat = %v, want %v", cfg.Worktree.DirectoryFormat, tt.value)
+			}
+		})
+	}
+}
+
+func TestSetSubdirectorySuffix(t *testing.T) {
+	tests := []struct {
+		name    string
+		value   string
+		wantErr bool
+	}{
+		{
+			name:    "valid suffix with hyphen",
+			value:   "-wt",
+			wantErr: false,
+		},
+		{
+			name:    "valid suffix with longer hyphen prefix",
+			value:   "-worktrees",
+			wantErr: false,
+		},
+		{
+			name:    "invalid suffix without hyphen",
+			value:   "wt",
+			wantErr: true,
+		},
+		{
+			name:    "empty suffix is valid",
+			value:   "",
+			wantErr: false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			cfg := &config.Config{
+				Worktree: config.WorktreeConfig{
+					DirectoryFormat:    config.DefaultDirectoryFormat,
+					SubdirectorySuffix: config.DefaultSubdirectorySuffix,
+				},
+			}
+
+			err := cfg.SetSubdirectorySuffix(tt.value)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("SetSubdirectorySuffix() error = %v, wantErr %v", err, tt.wantErr)
+			}
+
+			if !tt.wantErr && cfg.Worktree.SubdirectorySuffix != tt.value {
+				t.Errorf("SubdirectorySuffix = %v, want %v", cfg.Worktree.SubdirectorySuffix, tt.value)
+			}
+		})
+	}
+}
