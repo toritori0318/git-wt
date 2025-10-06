@@ -55,7 +55,9 @@ export PATH="$PATH:$(go env GOPATH)/bin"
 
 ### Step 2: Enable Shell Integration
 
-**Why needed?** The wt binary cannot change your current directory directly (child processes can't modify parent shell state). Shell integration provides a wrapper function that enables `wt go` to actually navigate.
+**Why needed?** The wt binary cannot change your current directory directly (child processes can't modify parent shell state). Shell integration provides a wrapper function that enables:
+- `wt go` to actually navigate between worktrees
+- `--cd` flag on commands like `wt new --cd` and `wt pr --cd` to automatically navigate after creation
 
 Choose your shell:
 
