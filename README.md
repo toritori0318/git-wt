@@ -90,6 +90,26 @@ type wt  # Should show "wt is a function"
 
 ## Core Commands
 
+```
+# new worktree
+wt new <branch> [<start-point>] [--cd]
+
+# new worktree with tmux session
+wt tmux new <branch> [<start-point>] [--count <count>] [--sync-panes] [--layout <layout>]
+
+# new worktree from the GitHub PR number
+wt pr <pr-number> [--branch <branch>] [--cd]
+
+# navigate between worktrees
+wt go [<filter>]
+
+# open worktree in editor
+wt open [<filter>] [--editor <editor>]
+# remove worktree
+wt clean [<filter>] [--force] [--keep-branch] [--yes]
+```
+
+
 ### Create Worktree
 ```bash
 wt new feature/new-ui              # Creates ../myproject-wt/feature-new-ui (subdirectory mode)
@@ -100,6 +120,25 @@ wt new bugfix/123 main             # Create from specific branch/commit
 By default, worktrees are organized in subdirectories (`<repo>-wt/<branch>`). You can customize this behavior using `wt config` (see Configuration section).
 
 The `--cd` flag outputs only the path (for shell function navigation) instead of user-friendly messages.
+
+### Tmux Sessions
+```bash
+wt tmux new feature/auth                           # Create worktree and open in tmux
+wt tmux new feature/auth --count 3                 # Create 3 worktrees in tmux panes
+wt tmux new feature/auth --count 3 --sync-panes    # Enable synchronized input across panes
+wt tmux new feature/auth --layout horizontal       # Use horizontal layout
+wt tmux new feature/auth --session-name my-feature # Custom session name
+```
+
+Creates one or more worktrees with numbered suffixes (feature-auth-1, feature-auth-2, etc.) and opens them in tmux panes.
+
+**Available layouts:**
+- `tiled` (default): Grid layout
+- `horizontal`: Horizontal split
+- `vertical`: Vertical split
+- `even-horizontal`, `even-vertical`, `main-horizontal`, `main-vertical`
+
+**Sync panes mode:** `--sync-panes` sends the same input to all panes simultaneously - useful for running identical commands across multiple worktrees.
 
 ### Navigate Between Worktrees
 ```bash
