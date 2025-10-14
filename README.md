@@ -187,7 +187,17 @@ wt clean --yes                # Skip all confirmations
 wt pr 123                          # Checkout PR #123 for review
 wt pr 123 --branch review/pr-123   # Specify custom local branch name
 wt pr 123 --cd                     # Navigate immediately after creation
+wt pr 123 --force                  # Skip all prompts, auto-use existing branches
 ```
+
+**Branch naming:** Uses the PR's original branch name by default (e.g., `feature/auth`).
+
+**Existing branch handling:**
+- If branch exists in a worktree:
+  - Without `--cd`: Shows info and exits
+  - With `--cd`: Prompts to navigate to existing worktree
+- If branch exists locally (not in worktree): Prompts to create worktree with existing branch
+- Use `--force` to skip all prompts
 
 **Prerequisites:** Requires GitHub CLI (`gh`) and authentication:
 ```bash

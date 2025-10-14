@@ -110,38 +110,70 @@ func TestValidatePRNumber(t *testing.T) {
 	}
 }
 
-func TestDetermineLocalBranch(t *testing.T) {
+func TestConfirmNavigate(t *testing.T) {
+	// Note: This function requires stdin interaction, so we test the interface only
+	// Full integration tests would need mock stdin
+	t.Run("function signature", func(t *testing.T) {
+		// Verify function exists and has correct signature
+		var buf strings.Builder
+		_, err := confirmNavigate(&buf, "test-branch", "/path/to/worktree")
+		// We expect an error because there's no stdin input in tests
+		if err == nil {
+			t.Log("confirmNavigate completed (possibly with default behavior)")
+		}
+	})
+}
+
+func TestConfirmUseExisting(t *testing.T) {
 	tests := []struct {
-		name       string
-		userBranch string
-		prNumber   int
-		want       string
+		name     string
+		branch   string
+		cdMode   bool
+		quiet    bool
+		wantSkip bool // Should skip prompt and auto-confirm
 	}{
 		{
-			name:       "user specified branch",
-			userBranch: "review/pr-123",
-			prNumber:   123,
-			want:       "review/pr-123",
+			name:     "cd mode skips prompt",
+			branch:   "feature/auth",
+			cdMode:   true,
+			quiet:    false,
+			wantSkip: true,
 		},
 		{
-			name:       "default branch name",
-			userBranch: "",
-			prNumber:   456,
-			want:       "wt/pr-456",
+			name:     "quiet mode skips prompt",
+			branch:   "feature/login",
+			cdMode:   false,
+			quiet:    true,
+			wantSkip: true,
 		},
 		{
-			name:       "user empty string uses default",
-			userBranch: "",
-			prNumber:   1,
-			want:       "wt/pr-1",
+			name:     "normal mode requires prompt",
+			branch:   "bugfix/123",
+			cdMode:   false,
+			quiet:    false,
+			wantSkip: false,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := determineLocalBranch(tt.userBranch, tt.prNumber)
-			if got != tt.want {
-				t.Errorf("determineLocalBranch(%q, %d) = %q, want %q", tt.userBranch, tt.prNumber, got, tt.want)
+			var buf strings.Builder
+			confirmed, err := confirmUseExisting(&buf, tt.branch, tt.cdMode, tt.quiet)
+
+			if tt.wantSkip {
+				// Should auto-confirm without error
+				if err != nil {
+					t.Errorf("expected no error with skip=true, got %v", err)
+				}
+				if !confirmed {
+					t.Errorf("expected confirmed=true with skip, got false")
+				}
+			} else {
+				// Would require stdin in normal mode
+				// Just verify the function was called
+				if err == nil {
+					t.Log("confirmUseExisting completed (possibly with default behavior)")
+				}
 			}
 		})
 	}

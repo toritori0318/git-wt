@@ -31,6 +31,7 @@ type prCmdConfig struct {
 	branch string
 	remote string
 	cd     bool
+	force  bool
 }
 
 func newPrCmd() *cobra.Command {
@@ -44,23 +45,35 @@ func newPrCmd() *cobra.Command {
 Uses GitHub CLI (gh) to fetch PR information and creates a dedicated worktree.
 Supports PRs from forks.
 
+Branch Naming:
+  By default, uses the PR's original branch name (e.g., feature/auth).
+
+Existing Branch Handling:
+  - If branch exists in a worktree:
+    - Without --cd: Shows info and exits
+    - With --cd: Prompts to navigate to existing worktree
+  - If branch exists locally (not in worktree): Prompts to create worktree with existing branch
+  - Use --force to skip all prompts
+
 Prerequisites:
   - GitHub CLI (gh) must be installed
   - Must be authenticated with gh auth login
 
 Examples:
-  wt pr 123                          # Review PR #123
-  wt pr 123 --branch review/pr-123   # Specify local branch name
-  wt pr 123 --cd                     # Move immediately after creation`,
+  wt pr 123                          # Review PR #123 (uses PR's branch name)
+  wt pr 123 --branch review/pr-123   # Specify custom local branch name
+  wt pr 123 --cd                     # Move immediately after creation
+  wt pr 123 --force                  # Skip all prompts, auto-use existing branches`,
 		Args: cobra.ExactArgs(1),
 		RunE: func(c *cobra.Command, args []string) error {
 			return runPRWithConfig(c, args, cfg)
 		},
 	}
 
-	cmd.Flags().StringVar(&cfg.branch, "branch", "", "Local branch name (default: wt/pr-<num>)")
+	cmd.Flags().StringVar(&cfg.branch, "branch", "", "Local branch name (default: PR's original branch name)")
 	cmd.Flags().StringVar(&cfg.remote, "remote", "", "Remote name (default: auto-detect)")
 	cmd.Flags().BoolVar(&cfg.cd, "cd", false, "Output only worktree path (for shell function)")
+	cmd.Flags().BoolVar(&cfg.force, "force", false, "Skip all prompts and use existing branches")
 
 	return cmd
 }
@@ -103,11 +116,61 @@ func runPRWithConfig(cmd *cobra.Command, args []string, cfg *prCmdConfig) error 
 	printPRInfo(w, prInfo, cfg.cd, flagQuiet)
 
 	// Determine local branch name
-	localBranch := determineLocalBranch(cfg.branch, prNumber)
+	localBranch := cfg.branch
+	if localBranch == "" {
+		localBranch = prInfo.HeadRefName
+	}
 
-	// Check if branch is already in use
-	if err := checkBranchNotInUse(ctx, localBranch); err != nil {
-		return err
+	// Check if branch is already in use by a worktree
+	existingWT, err := gitx.FindWorktreeByBranch(ctx, localBranch)
+	if err != nil {
+		return fmt.Errorf("failed to search worktrees: %w", err)
+	}
+
+	if existingWT != nil {
+		// Branch is in use by worktree
+		if cfg.cd {
+			// With --cd: prompt to navigate (or auto-navigate with --force)
+			if cfg.force {
+				// Force mode: auto-navigate without prompt
+				fmt.Fprintln(w, existingWT.Path)
+				return nil
+			}
+			if !flagQuiet {
+				fmt.Fprintf(w, "Branch '%s' is already in use by worktree.\n", localBranch)
+			}
+			if confirmed, err := confirmNavigate(w, localBranch, existingWT.Path); err != nil {
+				return err
+			} else if confirmed {
+				// User wants to navigate - output path for shell function
+				fmt.Fprintln(w, existingWT.Path)
+				return nil
+			}
+			// User declined navigation
+			return fmt.Errorf("operation cancelled")
+		}
+		// Without --cd: show info and exit
+		fmt.Fprintf(w, "Branch '%s' is already in use by worktree: %s\n", localBranch, existingWT.Path)
+		fmt.Fprintf(w, "Path: %s\n", existingWT.Path)
+		return nil
+	}
+
+	// Check if branch already exists locally
+	branchExists, err := gitx.BranchExists(ctx, localBranch)
+	if err != nil {
+		return fmt.Errorf("failed to check if branch exists: %w", err)
+	}
+
+	if branchExists {
+		// Branch exists but not in worktree - prompt to use it (or auto-use with --force)
+		if !cfg.force {
+			if confirmed, err := confirmUseExisting(w, localBranch, cfg.cd, flagQuiet); err != nil {
+				return err
+			} else if !confirmed {
+				return fmt.Errorf("operation cancelled")
+			}
+		}
+		// User confirmed or force mode - will use existing branch for worktree
 	}
 
 	// Determine remote and setup temporary remote if needed
@@ -160,11 +223,21 @@ func validatePRNumber(input string) (int, error) {
 	return prNumber, nil
 }
 
-func determineLocalBranch(userBranch string, prNumber int) string {
-	if userBranch != "" {
-		return userBranch
+// confirmNavigate asks user if they want to navigate to an existing worktree
+func confirmNavigate(w io.Writer, branch, path string) (bool, error) {
+	confirmed := confirm("Navigate to existing worktree?")
+	return confirmed, nil
+}
+
+// confirmUseExisting asks user if they want to use an existing branch for new worktree
+func confirmUseExisting(w io.Writer, branch string, cdMode, quiet bool) (bool, error) {
+	if cdMode || quiet {
+		// In cd or quiet mode, assume yes
+		return true, nil
 	}
-	return fmt.Sprintf("wt/pr-%d", prNumber)
+	fmt.Fprintf(w, "Branch '%s' already exists locally.\n", branch)
+	confirmed := confirm("Create new worktree using existing branch?")
+	return confirmed, nil
 }
 
 func determineRemote(w io.Writer, userRemote string, prInfo *ghx.PRInfo, prNumber int, cdMode, quiet bool) (remote, tempRemote string, err error) {
