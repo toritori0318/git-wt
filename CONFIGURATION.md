@@ -36,6 +36,17 @@ Specifies how worktree directories are organized.
 
 **Default value:** `subdirectory`
 
+### worktree.subdirectory_prefix
+
+Specifies the prefix to use in `subdirectory` mode.
+
+**Default value:** `.` (hidden directory)
+
+**Examples:**
+- `.` (default): `.myproject-wt/`
+- `` (empty): `myproject-wt/`
+- `_`: `_myproject-wt/`
+
 ### worktree.subdirectory_suffix
 
 Specifies the suffix to use in `subdirectory` mode.
@@ -58,7 +69,7 @@ work/
 │   ├── .git/
 │   ├── src/
 │   └── README.md
-└── myproject-wt/              # Worktrees directory
+└── .myproject-wt/              # Worktrees directory
     ├── feature-login/         # feature/login branch
     │   ├── .git
     │   ├── src/
@@ -83,17 +94,17 @@ work/
 ```bash
 # Use default suffix (-wt)
 wt new feature/login
-# → Creates ~/work/myproject-wt/feature-login
+# → Creates ~/work/.myproject-wt/feature-login
 
 # Set custom suffix
 wt config set worktree.subdirectory_suffix -worktrees
 wt new feature/login
-# → Creates ~/work/myproject-worktrees/feature-login
+# → Creates ~/work/.myproject-worktrees/feature-login
 
 # Another custom suffix
 wt config set worktree.subdirectory_suffix -branches
 wt new develop
-# → Creates ~/work/myproject-branches/develop
+# → Creates ~/work/.myproject-branches/develop
 ```
 
 ### Sibling Mode (Legacy)
@@ -170,6 +181,7 @@ You can also edit the configuration file (`~/.config/wt/config.yaml`) directly.
 ```yaml
 worktree:
   directory_format: subdirectory
+  subdirectory_prefix: .
   subdirectory_suffix: -wt
 ```
 
@@ -178,6 +190,7 @@ worktree:
 ```yaml
 worktree:
   directory_format: subdirectory
+  subdirectory_prefix: .
   subdirectory_suffix: -worktrees
 ```
 
@@ -186,6 +199,7 @@ worktree:
 ```yaml
 worktree:
   directory_format: sibling
+  subdirectory_prefix: .  # Not used in sibling mode
   subdirectory_suffix: -wt  # Not used in sibling mode
 ```
 

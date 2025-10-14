@@ -9,7 +9,7 @@ import (
 )
 
 // GenerateWorktreePath generates a unique worktree path using default configuration
-// Uses subdirectory mode by default: <baseDir>/<repoName>-wt/<sanitizedBranch>
+// Uses subdirectory mode by default: <baseDir>/.<repoName>-wt/<sanitizedBranch>
 func GenerateWorktreePath(baseDir, repoName, sanitizedBranch string) (string, error) {
 	// Load default config (or from default config path if available)
 	configPath, err := config.GetDefaultConfigPath()
@@ -18,6 +18,7 @@ func GenerateWorktreePath(baseDir, repoName, sanitizedBranch string) (string, er
 		cfg := &config.Config{
 			Worktree: config.WorktreeConfig{
 				DirectoryFormat:    config.DefaultDirectoryFormat,
+				SubdirectoryPrefix: config.DefaultSubdirectoryPrefix,
 				SubdirectorySuffix: config.DefaultSubdirectorySuffix,
 			},
 		}
@@ -30,6 +31,7 @@ func GenerateWorktreePath(baseDir, repoName, sanitizedBranch string) (string, er
 		cfg = &config.Config{
 			Worktree: config.WorktreeConfig{
 				DirectoryFormat:    config.DefaultDirectoryFormat,
+				SubdirectoryPrefix: config.DefaultSubdirectoryPrefix,
 				SubdirectorySuffix: config.DefaultSubdirectorySuffix,
 			},
 		}
@@ -43,8 +45,8 @@ func GenerateWorktreePathWithConfig(baseDir, repoName, sanitizedBranch string, c
 	const maxAttempts = 100
 
 	if cfg.GetDirectoryFormat() == config.DirectoryFormatSubdirectory {
-		// Subdirectory mode: <baseDir>/<repoName>-wt/<sanitizedBranch>
-		worktreeDir := repoName + cfg.GetSubdirectorySuffix()
+		// Subdirectory mode: <baseDir>/<prefix><repoName><suffix>/<sanitizedBranch>
+		worktreeDir := cfg.GetSubdirectoryPrefix() + repoName + cfg.GetSubdirectorySuffix()
 		return generateUniquePathInSubdir(baseDir, worktreeDir, sanitizedBranch, maxAttempts)
 	}
 

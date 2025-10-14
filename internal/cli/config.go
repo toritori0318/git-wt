@@ -19,6 +19,7 @@ Configuration file location: ~/.config/wt/config.yaml
 
 Available settings:
   worktree.directory_format     - "subdirectory" or "sibling"
+  worktree.subdirectory_prefix  - Prefix for subdirectory mode (default: ".")
   worktree.subdirectory_suffix  - Suffix for subdirectory mode (default: "-wt")`,
 	}
 
@@ -168,6 +169,7 @@ func printConfigList(w io.Writer, cfg *config.Config, configPath string) {
 	fmt.Fprintf(w, "Configuration file: %s (%s)\n\n", configPath, fileStatus)
 	fmt.Fprintln(w, "Settings:")
 	fmt.Fprintf(w, "  worktree.directory_format     = %s\n", cfg.GetDirectoryFormat())
+	fmt.Fprintf(w, "  worktree.subdirectory_prefix  = %s\n", cfg.GetSubdirectoryPrefix())
 	fmt.Fprintf(w, "  worktree.subdirectory_suffix  = %s\n", cfg.GetSubdirectorySuffix())
 }
 
@@ -175,6 +177,8 @@ func getConfigValue(cfg *config.Config, key string) (string, error) {
 	switch key {
 	case "worktree.directory_format":
 		return cfg.GetDirectoryFormat(), nil
+	case "worktree.subdirectory_prefix":
+		return cfg.GetSubdirectoryPrefix(), nil
 	case "worktree.subdirectory_suffix":
 		return cfg.GetSubdirectorySuffix(), nil
 	default:
@@ -186,6 +190,8 @@ func setConfigValue(cfg *config.Config, key, value string) error {
 	switch key {
 	case "worktree.directory_format":
 		return cfg.SetDirectoryFormat(value)
+	case "worktree.subdirectory_prefix":
+		return cfg.SetSubdirectoryPrefix(value)
 	case "worktree.subdirectory_suffix":
 		return cfg.SetSubdirectorySuffix(value)
 	default:

@@ -16,6 +16,8 @@ const (
 
 	// DefaultDirectoryFormat is the default directory format
 	DefaultDirectoryFormat = DirectoryFormatSubdirectory
+	// DefaultSubdirectoryPrefix is the default prefix for subdirectory mode
+	DefaultSubdirectoryPrefix = "."
 	// DefaultSubdirectorySuffix is the default suffix for subdirectory mode
 	DefaultSubdirectorySuffix = "-wt"
 )
@@ -29,6 +31,7 @@ type Config struct {
 // WorktreeConfig represents worktree-specific configuration
 type WorktreeConfig struct {
 	DirectoryFormat     string `yaml:"directory_format"`
+	SubdirectoryPrefix  string `yaml:"subdirectory_prefix"`
 	SubdirectorySuffix  string `yaml:"subdirectory_suffix"`
 }
 
@@ -39,6 +42,7 @@ func Load(path string) (*Config, error) {
 		path: path,
 		Worktree: WorktreeConfig{
 			DirectoryFormat:    DefaultDirectoryFormat,
+			SubdirectoryPrefix: DefaultSubdirectoryPrefix,
 			SubdirectorySuffix: DefaultSubdirectorySuffix,
 		},
 	}
@@ -72,6 +76,11 @@ func (c *Config) GetDirectoryFormat() string {
 	return c.Worktree.DirectoryFormat
 }
 
+// GetSubdirectoryPrefix returns the subdirectory prefix setting
+func (c *Config) GetSubdirectoryPrefix() string {
+	return c.Worktree.SubdirectoryPrefix
+}
+
 // GetSubdirectorySuffix returns the subdirectory suffix setting
 func (c *Config) GetSubdirectorySuffix() string {
 	return c.Worktree.SubdirectorySuffix
@@ -100,6 +109,13 @@ func (c *Config) SetDirectoryFormat(format string) error {
 		return fmt.Errorf("invalid value for directory_format: %s (must be 'subdirectory' or 'sibling')", format)
 	}
 	c.Worktree.DirectoryFormat = format
+	return nil
+}
+
+// SetSubdirectoryPrefix sets the subdirectory prefix
+func (c *Config) SetSubdirectoryPrefix(prefix string) error {
+	// No validation needed - any string is valid as prefix
+	c.Worktree.SubdirectoryPrefix = prefix
 	return nil
 }
 

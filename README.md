@@ -5,7 +5,7 @@ A CLI tool that makes git worktree management intuitive through conventions and 
 ## What is wt?
 
 `wt` simplifies working with multiple git branches simultaneously by:
-- **Auto-organizing worktrees** in subdirectories (`myproject-wt/feature-name`)
+- **Auto-organizing worktrees** in subdirectories (`.myproject-wt/feature-name`)
 - **Interactive selection** with fzf for navigation and cleanup
 - **Configurable directory structure** - subdirectory or sibling mode
 - **Single binary** - no runtime dependencies
@@ -24,11 +24,11 @@ git worktree add ../myproject-feature-login -b feature/login
 cd ../myproject-feature-login
 
 # With wt (subdirectory mode)
-wt new feature/login --cd  # Creates myproject-wt/feature-login (--cd enables auto-navigation)
+wt new feature/login --cd  # Creates .myproject-wt/feature-login (--cd enables auto-navigation)
 
 # Results in:
 # myproject/              ← main branch
-# myproject-wt/
+# .myproject-wt/
 #   └── feature-login/    ← new worktree
 ```
 
@@ -119,12 +119,12 @@ wt clean [<filter>] [--force] [--keep-branch] [--yes]
 
 ### Create Worktree
 ```bash
-wt new feature/new-ui              # Creates ../myproject-wt/feature-new-ui (subdirectory mode)
+wt new feature/new-ui              # Creates .myproject-wt/feature-new-ui (subdirectory mode)
 wt new feature/fix --cd            # Create and navigate immediately
 wt new bugfix/123 main             # Create from specific branch/commit
 ```
 
-By default, worktrees are organized in subdirectories (`<repo>-wt/<branch>`). You can customize this behavior using `wt config` (see Configuration section).
+By default, worktrees are organized in subdirectories (`.<repo>-wt/<branch>`). You can customize this behavior using `wt config` (see Configuration section).
 
 **Directory structure example:**
 ```
@@ -132,7 +132,7 @@ work/
 ├── myproject/              # Main repository (main branch)
 │   ├── .git/
 │   └── src/
-└── myproject-wt/           # Worktrees directory
+└── .myproject-wt/           # Worktrees directory
     ├── feature-new-ui/     # wt new feature/new-ui
     ├── feature-fix/        # wt new feature/fix
     └── bugfix-123/         # wt new bugfix/123
@@ -216,7 +216,7 @@ wt config reset   # Reset to defaults
 **Configuration file:** `~/.config/wt/config.yaml`
 
 **Directory modes:**
-- `subdirectory` (default): Organizes worktrees in `<repo>-wt/<branch>` structure
+- `subdirectory` (default): Organizes worktrees in `.<repo>-wt/<branch>` structure
 - `sibling`: Places worktrees as `<repo>-<branch>` (legacy mode)
 
 For detailed configuration options, directory structure examples, and best practices, see [CONFIGURATION.md](CONFIGURATION.md).

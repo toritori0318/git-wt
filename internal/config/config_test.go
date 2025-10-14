@@ -8,29 +8,32 @@ import (
 	"github.com/toritori0318/git-wt/internal/config"
 )
 
-// テストリスト（網羅したいテストシナリオ）
-// 1. デフォルト設定の取得 ✓
-//    - ファイルが存在しない場合、デフォルト値が返される
-//    - directory_format は "subdirectory"
-//    - subdirectory_suffix は "-wt"
-// 2. 設定ファイルからの読み込み
-//    - 有効なYAMLファイルから設定を読み込める
-//    - directory_format が "sibling" の場合も読み込める
-//    - カスタムの subdirectory_suffix が読み込める
-// 3. 設定ファイルへの保存
-//    - 設定をYAMLファイルに保存できる
-//    - ディレクトリが存在しない場合は自動作成される
-// 4. 設定値の検証
-//    - 不正な directory_format（"subdirectory", "sibling" 以外）はエラー
-// 5. 設定のリセット
-//    - 設定ファイルを削除できる
-// 6. 個別設定値の取得
-//    - GetDirectoryFormat() でフォーマットを取得できる
-//    - GetSubdirectorySuffix() でサフィックスを取得できる
+// Test scenarios to cover:
+// 1. Get default configuration ✓
+//    - Returns default values when file doesn't exist
+//    - directory_format is "subdirectory"
+//    - subdirectory_prefix is "."
+//    - subdirectory_suffix is "-wt"
+// 2. Load configuration from file
+//    - Can load settings from valid YAML file
+//    - Can load when directory_format is "sibling"
+//    - Can load custom subdirectory_prefix
+//    - Can load custom subdirectory_suffix
+// 3. Save configuration to file
+//    - Can save settings to YAML file
+//    - Automatically creates directory if it doesn't exist
+// 4. Validate configuration values
+//    - Returns error for invalid directory_format (other than "subdirectory" or "sibling")
+// 5. Reset configuration
+//    - Can delete configuration file
+// 6. Get individual configuration values
+//    - Can get format with GetDirectoryFormat()
+//    - Can get prefix with GetSubdirectoryPrefix()
+//    - Can get suffix with GetSubdirectorySuffix()
 
 // TestDefaultConfig tests that default configuration is returned when no config file exists
 func TestDefaultConfig(t *testing.T) {
-	// 一時ディレクトリを使用してテスト
+	// Use temporary directory for testing
 	tempDir := t.TempDir()
 	configPath := filepath.Join(tempDir, "config.yaml")
 
@@ -45,6 +48,10 @@ func TestDefaultConfig(t *testing.T) {
 		t.Errorf("GetDirectoryFormat() = %q, want %q", got, "subdirectory")
 	}
 
+	if got := cfg.GetSubdirectoryPrefix(); got != "." {
+		t.Errorf("GetSubdirectoryPrefix() = %q, want %q", got, ".")
+	}
+
 	if got := cfg.GetSubdirectorySuffix(); got != "-wt" {
 		t.Errorf("GetSubdirectorySuffix() = %q, want %q", got, "-wt")
 	}
@@ -56,15 +63,18 @@ func TestLoadFromFile(t *testing.T) {
 		name           string
 		yamlContent    string
 		wantFormat     string
+		wantPrefix     string
 		wantSuffix     string
 		wantErr        bool
 	}{
 		{
-			name: "subdirectory format with default suffix",
+			name: "subdirectory format with default prefix and suffix",
 			yamlContent: `worktree:
   directory_format: subdirectory
+  subdirectory_prefix: .
   subdirectory_suffix: -wt`,
 			wantFormat: "subdirectory",
+			wantPrefix: ".",
 			wantSuffix: "-wt",
 			wantErr:    false,
 		},
@@ -73,16 +83,30 @@ func TestLoadFromFile(t *testing.T) {
 			yamlContent: `worktree:
   directory_format: sibling`,
 			wantFormat: "sibling",
+			wantPrefix: ".", // Default prefix is preserved (not used in sibling mode)
 			wantSuffix: "-wt", // Default suffix is preserved (not used in sibling mode)
 			wantErr:    false,
 		},
 		{
-			name: "custom subdirectory suffix",
+			name: "custom subdirectory prefix and suffix",
 			yamlContent: `worktree:
   directory_format: subdirectory
+  subdirectory_prefix: _
   subdirectory_suffix: -worktrees`,
 			wantFormat: "subdirectory",
+			wantPrefix: "_",
 			wantSuffix: "-worktrees",
+			wantErr:    false,
+		},
+		{
+			name: "empty subdirectory prefix",
+			yamlContent: `worktree:
+  directory_format: subdirectory
+  subdirectory_prefix: ""
+  subdirectory_suffix: -wt`,
+			wantFormat: "subdirectory",
+			wantPrefix: "",
+			wantSuffix: "-wt",
 			wantErr:    false,
 		},
 		{
@@ -121,6 +145,10 @@ func TestLoadFromFile(t *testing.T) {
 				t.Errorf("GetDirectoryFormat() = %q, want %q", got, tt.wantFormat)
 			}
 
+			if got := cfg.GetSubdirectoryPrefix(); got != tt.wantPrefix {
+				t.Errorf("GetSubdirectoryPrefix() = %q, want %q", got, tt.wantPrefix)
+			}
+
 			if got := cfg.GetSubdirectorySuffix(); got != tt.wantSuffix {
 				t.Errorf("GetSubdirectorySuffix() = %q, want %q", got, tt.wantSuffix)
 			}
@@ -141,6 +169,7 @@ func TestSaveConfig(t *testing.T) {
 
 	// Modify config
 	cfg.Worktree.DirectoryFormat = "sibling"
+	cfg.Worktree.SubdirectoryPrefix = "_"
 	cfg.Worktree.SubdirectorySuffix = "-custom"
 
 	// Save config (should create directory if needed)
@@ -161,6 +190,10 @@ func TestSaveConfig(t *testing.T) {
 
 	if got := cfg2.GetDirectoryFormat(); got != "sibling" {
 		t.Errorf("After Save/Load: GetDirectoryFormat() = %q, want %q", got, "sibling")
+	}
+
+	if got := cfg2.GetSubdirectoryPrefix(); got != "_" {
+		t.Errorf("After Save/Load: GetSubdirectoryPrefix() = %q, want %q", got, "_")
 	}
 
 	if got := cfg2.GetSubdirectorySuffix(); got != "-custom" {
@@ -321,6 +354,56 @@ func TestSetDirectoryFormat(t *testing.T) {
 
 			if !tt.wantErr && cfg.Worktree.DirectoryFormat != tt.value {
 				t.Errorf("DirectoryFormat = %v, want %v", cfg.Worktree.DirectoryFormat, tt.value)
+			}
+		})
+	}
+}
+
+func TestSetSubdirectoryPrefix(t *testing.T) {
+	tests := []struct {
+		name    string
+		value   string
+		wantErr bool
+	}{
+		{
+			name:    "valid prefix with dot",
+			value:   ".",
+			wantErr: false,
+		},
+		{
+			name:    "valid prefix with underscore",
+			value:   "_",
+			wantErr: false,
+		},
+		{
+			name:    "empty prefix is valid",
+			value:   "",
+			wantErr: false,
+		},
+		{
+			name:    "arbitrary string is valid",
+			value:   "prefix-",
+			wantErr: false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			cfg := &config.Config{
+				Worktree: config.WorktreeConfig{
+					DirectoryFormat:    config.DefaultDirectoryFormat,
+					SubdirectoryPrefix: config.DefaultSubdirectoryPrefix,
+					SubdirectorySuffix: config.DefaultSubdirectorySuffix,
+				},
+			}
+
+			err := cfg.SetSubdirectoryPrefix(tt.value)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("SetSubdirectoryPrefix() error = %v, wantErr %v", err, tt.wantErr)
+			}
+
+			if !tt.wantErr && cfg.Worktree.SubdirectoryPrefix != tt.value {
+				t.Errorf("SubdirectoryPrefix = %v, want %v", cfg.Worktree.SubdirectoryPrefix, tt.value)
 			}
 		})
 	}
