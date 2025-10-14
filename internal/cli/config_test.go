@@ -10,11 +10,11 @@ import (
 	"github.com/toritori0318/git-wt/internal/config"
 )
 
-// テストリスト
-// 1. config list - 設定一覧の表示 ✓
-// 2. config get - 特定の設定値の取得 ✓
-// 3. config set - 設定値の変更 ✓
-// 4. config reset - 設定のリセット ✓
+// Test scenarios to cover:
+// 1. config list - Display all configuration settings ✓
+// 2. config get - Get specific configuration value ✓
+// 3. config set - Change configuration value ✓
+// 4. config reset - Reset configuration to defaults ✓
 
 func TestPrintConfigList(t *testing.T) {
 	cfg := &config.Config{

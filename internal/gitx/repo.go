@@ -8,9 +8,9 @@ import (
 
 // Repo represents repository information
 type Repo struct {
-	Root   string // リポジトリルートの絶対パス
-	Name   string // リポジトリ名（ディレクトリ名）
-	Parent string // リポジトリルートの親ディレクトリ（兄弟配置用）
+	Root   string // Absolute path to repository root
+	Name   string // Repository name (directory name)
+	Parent string // Parent directory of repository root (for sibling placement)
 }
 
 // GetRepo returns repository information for the current or specified directory
