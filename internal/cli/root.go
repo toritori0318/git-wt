@@ -101,6 +101,16 @@ It manages worktrees in sibling directories with automatic naming conventions.`,
 
 		return nil
 	},
+	RunE: func(cmd *cobra.Command, args []string) error {
+		// If no arguments, show help
+		if len(args) == 0 {
+			return cmd.Help()
+		}
+
+		// If we reach here, it means the subcommand wasn't found
+		// Pass through to git worktree
+		return passthroughToGitWorktree(cmd, os.Args[1:])
+	},
 }
 
 func init() {
