@@ -89,6 +89,11 @@ func runPRWithConfig(cmd *cobra.Command, args []string, cfg *prCmdConfig) error 
 	ctx := cmd.Context()
 	w := cmd.OutOrStdout()
 
+	// Check if shell function is configured when using --cd
+	if err := checkShellFunction(cfg.cd); err != nil {
+		return err
+	}
+
 	// Validate PR number
 	prNumber, err := validatePRNumber(args[0])
 	if err != nil {

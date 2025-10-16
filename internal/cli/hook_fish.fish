@@ -2,6 +2,8 @@
 # Shell function: wt go / any command --cd executes actual cd
 
 function wt
+    # Set environment variable to indicate shell function is active
+    set -gx WT_SHELL_FUNCTION 1
     if test (count $argv) -gt 0; and test $argv[1] = "go"
         set -e argv[1]
         # Fast-path: delegate help/version directly to binary

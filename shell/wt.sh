@@ -14,6 +14,8 @@
 # Acts as shell function for wt go / any command with --cd to execute actual cd
 # Other commands are delegated to binary
 function wt() {
+  # Set environment variable to indicate shell function is active
+  export WT_SHELL_FUNCTION=1
   if [[ "$1" == "go" ]]; then
     shift
     # Fast-path: delegate help/version directly to binary

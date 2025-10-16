@@ -69,6 +69,11 @@ func init() {
 func runNewWithConfig(cmd *cobra.Command, args []string, cfg *newCmdConfig) error {
 	ctx := cmd.Context()
 
+	// Check if shell function is configured when using --cd
+	if err := checkShellFunction(cfg.cd); err != nil {
+		return err
+	}
+
 	// Parse and validate arguments
 	branch := args[0]
 	if err := validateBranchName(branch); err != nil {

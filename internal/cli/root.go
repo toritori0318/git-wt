@@ -43,6 +43,35 @@ func SetVersionInfo(version, commit, date string) {
 	rootCmd.Version = fmt.Sprintf("%s (commit: %s, built: %s)", version, commit, date)
 }
 
+// ShellFunctionNotConfiguredError represents an error when shell function is not configured
+type ShellFunctionNotConfiguredError struct{}
+
+func (e *ShellFunctionNotConfiguredError) Error() string {
+	return `Cannot change directory: shell function not configured.
+
+To enable directory navigation with --cd flag, configure your shell:
+
+  Bash:   echo 'eval "$(wt hook bash)"' >> ~/.bashrc
+  Zsh:    echo 'eval "$(wt hook zsh)"' >> ~/.zshrc
+  Fish:   wt hook fish > ~/.config/fish/functions/wt.fish
+
+Then restart your shell or run: exec $SHELL`
+}
+
+// checkShellFunction checks if shell function is configured when using --cd flag
+func checkShellFunction(cdMode bool) error {
+	if !cdMode {
+		return nil
+	}
+
+	// Check if WT_SHELL_FUNCTION environment variable is set
+	if os.Getenv("WT_SHELL_FUNCTION") == "" {
+		return &ShellFunctionNotConfiguredError{}
+	}
+
+	return nil
+}
+
 var rootCmd = &cobra.Command{
 	Use:   "wt",
 	Short: "Git worktree helper CLI",
