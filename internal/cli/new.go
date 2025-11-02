@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -148,20 +149,34 @@ func resolveAndValidateBaseDir(customBaseDir, defaultBaseDir string) (string, er
 		return defaultBaseDir, nil
 	}
 
+	// Normalize path (resolve relative paths and symlinks)
+	absPath, err := filepath.Abs(baseDir)
+	if err != nil {
+		return "", fmt.Errorf("failed to resolve absolute path: %w", err)
+	}
+
 	// Validate user-specified base directory
-	info, err := os.Stat(baseDir)
+	info, err := os.Stat(absPath)
 	if err != nil {
 		if os.IsNotExist(err) {
-			return "", fmt.Errorf("base directory does not exist: %s", baseDir)
+			return "", fmt.Errorf("base directory does not exist: %s", absPath)
 		}
 		return "", fmt.Errorf("failed to access base directory: %w", err)
 	}
 
 	if !info.IsDir() {
-		return "", fmt.Errorf("base directory is not a directory: %s", baseDir)
+		return "", fmt.Errorf("base directory is not a directory: %s", absPath)
 	}
 
-	return baseDir, nil
+	// Resolve symlinks for canonical path
+	canonicalPath, err := filepath.EvalSymlinks(absPath)
+	if err != nil {
+		// If EvalSymlinks fails, fall back to absPath
+		// (this can happen with some filesystems or permissions)
+		return absPath, nil
+	}
+
+	return canonicalPath, nil
 }
 
 func checkBranchNotInUse(ctx context.Context, branch string) error {

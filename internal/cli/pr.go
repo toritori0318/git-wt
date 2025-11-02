@@ -126,6 +126,11 @@ func runPRWithConfig(cmd *cobra.Command, args []string, cfg *prCmdConfig) error 
 		localBranch = prInfo.HeadRefName
 	}
 
+	// Validate branch name
+	if err := validateBranchName(localBranch); err != nil {
+		return fmt.Errorf("invalid branch name '%s': %w", localBranch, err)
+	}
+
 	// Check if branch is already in use by a worktree
 	existingWT, err := gitx.FindWorktreeByBranch(ctx, localBranch)
 	if err != nil {
