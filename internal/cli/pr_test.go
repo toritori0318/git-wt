@@ -178,3 +178,52 @@ func TestConfirmUseExisting(t *testing.T) {
 		})
 	}
 }
+
+func TestValidatePRBranchName(t *testing.T) {
+	tests := []struct {
+		name       string
+		branchName string
+		wantErr    bool
+	}{
+		{
+			name:       "valid branch name",
+			branchName: "feature/auth",
+			wantErr:    false,
+		},
+		{
+			name:       "valid branch name with numbers",
+			branchName: "feature-123",
+			wantErr:    false,
+		},
+		{
+			name:       "branch name starting with dash",
+			branchName: "-bad",
+			wantErr:    true,
+		},
+		{
+			name:       "branch name with double dots",
+			branchName: "feature..auth",
+			wantErr:    true,
+		},
+		{
+			name:       "empty branch name",
+			branchName: "",
+			wantErr:    true,
+		},
+		{
+			name:       "whitespace only branch name",
+			branchName: "   ",
+			wantErr:    true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := validateBranchName(tt.branchName)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("validateBranchName(%q) error = %v, wantErr %v", tt.branchName, err, tt.wantErr)
+			}
+		})
+	}
+}
+
