@@ -3,6 +3,7 @@ package cli
 import (
 	"fmt"
 	"io"
+	"os"
 	"strconv"
 
 	"github.com/spf13/cobra"
@@ -146,9 +147,7 @@ func runPRWithConfig(cmd *cobra.Command, args []string, cfg *prCmdConfig) error 
 				fmt.Fprintln(w, existingWT.Path)
 				return nil
 			}
-			if !flagQuiet {
-				fmt.Fprintf(w, "Branch '%s' is already in use by worktree.\n", localBranch)
-			}
+			printExistingWorktreeNotice(os.Stderr, localBranch, flagQuiet)
 			if confirmed, err := confirmNavigate(w, localBranch, existingWT.Path); err != nil {
 				return err
 			} else if confirmed {
@@ -231,6 +230,18 @@ func validatePRNumber(input string) (int, error) {
 		return 0, &InvalidPRNumberError{Input: input}
 	}
 	return prNumber, nil
+}
+
+// printExistingWorktreeNotice writes the "already in use" notice to w.
+// Callers must pass os.Stderr, not the command's stdout writer: in --cd mode
+// stdout is captured by the shell wrapper via command substitution, so
+// anything written there would silently vanish instead of reaching the
+// terminal.
+func printExistingWorktreeNotice(w io.Writer, branch string, quiet bool) {
+	if quiet {
+		return
+	}
+	fmt.Fprintf(w, "Branch '%s' is already in use by worktree.\n", branch)
 }
 
 // confirmNavigate asks user if they want to navigate to an existing worktree
