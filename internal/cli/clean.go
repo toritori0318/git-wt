@@ -273,13 +273,20 @@ func printBranchKeptMessage(w io.Writer, branch string, quiet bool) {
 	fmt.Fprintf(w, "Branch '%s' will be kept\n", branch)
 }
 
-// confirm prompts user for confirmation
+// confirm prompts user for confirmation. The prompt is written to stderr,
+// not stdout: `wt ... --cd` captures stdout via shell command substitution,
+// so a prompt on stdout would never reach the terminal and the read would
+// silently block.
 func confirm(message string) bool {
-	reader := bufio.NewReader(os.Stdin)
-	fmt.Printf("%s (y/N): ", message)
+	return confirmWithIO(os.Stdin, os.Stderr, message)
+}
+
+func confirmWithIO(r io.Reader, w io.Writer, message string) bool {
+	reader := bufio.NewReader(r)
+	fmt.Fprintf(w, "%s (y/N): ", message)
 
 	input, err := reader.ReadString('\n')
-	if err != nil {
+	if err != nil && input == "" {
 		return false
 	}
 

@@ -26,9 +26,36 @@ func TestWorktreeRemovalCancelledError(t *testing.T) {
 	}
 }
 
-func TestConfirm(t *testing.T) {
-	// Note: This function reads from os.Stdin, so it's difficult to test without mocking.
-	// In a real test environment, you would use dependency injection or interfaces to make this testable.
-	// For now, we'll skip this test or use a mock stdin.
-	t.Skip("confirm() requires stdin interaction, skipping for now")
+func TestConfirmWithIO(t *testing.T) {
+	tests := []struct {
+		name  string
+		input string
+		want  bool
+	}{
+		{name: "y answers yes", input: "y\n", want: true},
+		{name: "Y uppercase answers yes", input: "Y\n", want: true},
+		{name: "yes answers yes", input: "yes\n", want: true},
+		{name: "n answers no", input: "n\n", want: false},
+		{name: "empty line answers no", input: "\n", want: false},
+		{name: "no input (EOF) answers no", input: "", want: false},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			var out strings.Builder
+			got := confirmWithIO(strings.NewReader(tt.input), &out, "Proceed?")
+			if got != tt.want {
+				t.Errorf("confirmWithIO(%q) = %v, want %v", tt.input, got, tt.want)
+			}
+		})
+	}
+}
+
+func TestConfirmWithIOWritesPromptToGivenWriter(t *testing.T) {
+	var out strings.Builder
+	confirmWithIO(strings.NewReader("y\n"), &out, "Proceed?")
+
+	if !strings.Contains(out.String(), "Proceed? (y/N): ") {
+		t.Errorf("expected prompt to be written to writer, got: %q", out.String())
+	}
 }

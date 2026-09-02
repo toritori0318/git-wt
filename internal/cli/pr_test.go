@@ -110,6 +110,32 @@ func TestValidatePRNumber(t *testing.T) {
 	}
 }
 
+func TestPrintExistingWorktreeNotice(t *testing.T) {
+	tests := []struct {
+		name       string
+		quiet      bool
+		wantOutput bool
+	}{
+		{name: "quiet suppresses notice", quiet: true, wantOutput: false},
+		{name: "normal mode shows notice", quiet: false, wantOutput: true},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			var buf strings.Builder
+			printExistingWorktreeNotice(&buf, "feature/x", tt.quiet)
+
+			gotOutput := buf.Len() > 0
+			if gotOutput != tt.wantOutput {
+				t.Errorf("printExistingWorktreeNotice() wrote output = %v, want %v", gotOutput, tt.wantOutput)
+			}
+			if tt.wantOutput && !strings.Contains(buf.String(), "feature/x") {
+				t.Errorf("expected notice to mention branch name, got: %q", buf.String())
+			}
+		})
+	}
+}
+
 func TestConfirmNavigate(t *testing.T) {
 	// Note: This function requires stdin interaction, so we test the interface only
 	// Full integration tests would need mock stdin
