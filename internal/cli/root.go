@@ -16,9 +16,13 @@ import (
 
 var (
 	// Global flags
-	flagRepo  string
-	flagQuiet bool
-	flagDebug bool
+	flagRepo    string
+	flagQuiet   bool
+	flagDebug   bool
+	flagNoCD    bool
+	flagBaseDir string
+	flagBranch  string
+	flagRemote  string
 
 	// Version information (set by main package)
 	versionInfo = "dev"
@@ -123,6 +127,10 @@ func init() {
 	rootCmd.PersistentFlags().StringVar(&flagRepo, "repo", "", "Manually specify repository root path")
 	rootCmd.PersistentFlags().BoolVar(&flagQuiet, "quiet", false, "Minimal output")
 	rootCmd.PersistentFlags().BoolVar(&flagDebug, "debug", false, "Debug mode (show command execution)")
+	rootCmd.PersistentFlags().BoolVar(&flagNoCD, "no-cd", false, "Stay in the current directory and print a summary instead of navigating")
+	rootCmd.PersistentFlags().StringVar(&flagBaseDir, "base-dir", "", "Base directory for worktree placement (defaults to repository parent)")
+	rootCmd.PersistentFlags().StringVar(&flagBranch, "branch", "", "Local branch name for wt pr (default: PR's original branch name)")
+	rootCmd.PersistentFlags().StringVar(&flagRemote, "remote", "", "Remote name for wt pr (default: auto-detect)")
 
 	// Disable interspersed flags to allow subcommand arguments that start with '-'
 	// This prevents arguments like "-wttt" from being interpreted as global flags
@@ -205,13 +213,16 @@ func filterPassthroughArgs(args []string) []string {
 			return out
 
 		// Boolean persistent flags (do not forward)
-		case a == "--debug", a == "--quiet":
+		case a == "--debug", a == "--quiet", a == "--no-cd":
 			continue
 
 		// Value persistent flag forms
-		case strings.HasPrefix(a, "--repo="):
+		case strings.HasPrefix(a, "--repo="),
+			strings.HasPrefix(a, "--base-dir="),
+			strings.HasPrefix(a, "--branch="),
+			strings.HasPrefix(a, "--remote="):
 			continue
-		case a == "--repo":
+		case a == "--repo", a == "--base-dir", a == "--branch", a == "--remote":
 			// Skip the value token
 			skipNext = true
 			continue

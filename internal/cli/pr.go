@@ -29,10 +29,7 @@ func (e *InvalidPRNumberError) Error() string {
 }
 
 type prCmdConfig struct {
-	branch string
-	remote string
-	noCD   bool
-	yes    bool
+	yes bool
 }
 
 func newPrCmd() *cobra.Command {
@@ -77,9 +74,6 @@ Examples:
 		},
 	}
 
-	cmd.Flags().StringVar(&cfg.branch, "branch", "", "Local branch name (default: PR's original branch name)")
-	cmd.Flags().StringVar(&cfg.remote, "remote", "", "Remote name (default: auto-detect)")
-	cmd.Flags().BoolVar(&cfg.noCD, "no-cd", false, "Stay in the current directory and print a summary instead of navigating")
 	cmd.Flags().BoolVar(&cfg.yes, "yes", false, "Skip confirmation prompts")
 
 	return cmd
@@ -97,7 +91,7 @@ func runPRWithConfig(cmd *cobra.Command, args []string, cfg *prCmdConfig) error 
 	w := cmd.OutOrStdout()
 
 	// Navigation is the default; --no-cd stays put and does not need the shell function.
-	if err := checkShellFunction(!cfg.noCD); err != nil {
+	if err := checkShellFunction(!flagNoCD); err != nil {
 		return err
 	}
 
@@ -119,7 +113,7 @@ func runPRWithConfig(cmd *cobra.Command, args []string, cfg *prCmdConfig) error 
 	}
 
 	// pathOnly is the default: stdout is a single path for the shell function to cd.
-	pathOnly := !cfg.noCD
+	pathOnly := !flagNoCD
 
 	// Fetch PR info
 	printPRProgress(w, "Fetching PR #%d info...\n", prNumber, pathOnly, flagQuiet)
@@ -131,7 +125,7 @@ func runPRWithConfig(cmd *cobra.Command, args []string, cfg *prCmdConfig) error 
 	printPRInfo(w, prInfo, pathOnly, flagQuiet)
 
 	// Determine local branch name
-	localBranch := cfg.branch
+	localBranch := flagBranch
 	if localBranch == "" {
 		localBranch = prInfo.HeadRefName
 	}
@@ -150,7 +144,7 @@ func runPRWithConfig(cmd *cobra.Command, args []string, cfg *prCmdConfig) error 
 	if existingWT != nil {
 		// Already checked out. --no-cd reports the path and stays put.
 		// Otherwise navigate without asking (default, and --yes).
-		if cfg.noCD {
+		if flagNoCD {
 			fmt.Fprintf(w, "Branch '%s' is already in use by worktree: %s\n", localBranch, existingWT.Path)
 			fmt.Fprintf(w, "Path: %s\n", existingWT.Path)
 			return nil
@@ -178,7 +172,7 @@ func runPRWithConfig(cmd *cobra.Command, args []string, cfg *prCmdConfig) error 
 	}
 
 	// Determine remote and setup temporary remote if needed
-	remote, tempRemote, err := determineRemote(w, cfg.remote, prInfo, prNumber, pathOnly, flagQuiet)
+	remote, tempRemote, err := determineRemote(w, flagRemote, prInfo, prNumber, pathOnly, flagQuiet)
 	if err != nil {
 		return err
 	}

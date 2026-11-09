@@ -17,9 +17,9 @@ function _wt_should_navigate
                 break
             case -h --help help --version --no-cd
                 return 1
-            case --repo
+            case --repo --base-dir --branch --remote
                 set skip_value 1
-            case '--repo=*'
+            case '--repo=*' '--base-dir=*' '--branch=*' '--remote=*'
             case '-*'
             case '*'
                 if test -z "$cmd"

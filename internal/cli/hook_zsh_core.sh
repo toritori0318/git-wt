@@ -20,10 +20,10 @@ _wt_should_navigate() {
       -h|--help|help|--version|--no-cd)
         return 1
         ;;
-      --repo)
+      --repo|--base-dir|--branch|--remote)
         skip_value=1
         ;;
-      --repo=*)
+      --repo=*|--base-dir=*|--branch=*|--remote=*)
         ;;
       -*)
         ;;

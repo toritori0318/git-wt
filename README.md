@@ -252,10 +252,14 @@ wt prune          # → git worktree prune
 
 ### Global Flags
 
-Available for all commands:
+Available for all commands, before or after the subcommand:
 - `--debug` - Show git command execution
 - `--quiet` - Minimal output
 - `--repo <path>` - Manually specify repository root
+- `--no-cd` - Stay in the current directory (`wt new` and `wt pr`)
+- `--base-dir <path>` - Base directory for worktree placement (`wt new`, `wt tmux new`)
+- `--branch <name>` - Local branch name (`wt pr`)
+- `--remote <name>` - Remote name (`wt pr`)
 - `-h, --help` - Show help for any command
 
 ## Optional Dependencies
