@@ -136,46 +136,32 @@ func TestPrintExistingWorktreeNotice(t *testing.T) {
 	}
 }
 
-func TestConfirmNavigate(t *testing.T) {
-	// Note: This function requires stdin interaction, so we test the interface only
-	// Full integration tests would need mock stdin
-	t.Run("function signature", func(t *testing.T) {
-		// Verify function exists and has correct signature
-		var buf strings.Builder
-		_, err := confirmNavigate(&buf, "test-branch", "/path/to/worktree")
-		// We expect an error because there's no stdin input in tests
-		if err == nil {
-			t.Log("confirmNavigate completed (possibly with default behavior)")
-		}
-	})
-}
-
 func TestConfirmUseExisting(t *testing.T) {
 	tests := []struct {
 		name     string
 		branch   string
-		cdMode   bool
+		autoYes  bool
 		quiet    bool
 		wantSkip bool // Should skip prompt and auto-confirm
 	}{
 		{
-			name:     "cd mode skips prompt",
+			name:     "auto yes skips prompt",
 			branch:   "feature/auth",
-			cdMode:   true,
+			autoYes:  true,
 			quiet:    false,
 			wantSkip: true,
 		},
 		{
 			name:     "quiet mode skips prompt",
 			branch:   "feature/login",
-			cdMode:   false,
+			autoYes:  false,
 			quiet:    true,
 			wantSkip: true,
 		},
 		{
-			name:     "normal mode requires prompt",
+			name:     "no-cd without yes requires prompt",
 			branch:   "bugfix/123",
-			cdMode:   false,
+			autoYes:  false,
 			quiet:    false,
 			wantSkip: false,
 		},
@@ -184,7 +170,7 @@ func TestConfirmUseExisting(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			var buf strings.Builder
-			confirmed, err := confirmUseExisting(&buf, tt.branch, tt.cdMode, tt.quiet)
+			confirmed, err := confirmUseExisting(&buf, tt.branch, tt.autoYes, tt.quiet)
 
 			if tt.wantSkip {
 				// Should auto-confirm without error
@@ -252,4 +238,3 @@ func TestValidatePRBranchName(t *testing.T) {
 		})
 	}
 }
-

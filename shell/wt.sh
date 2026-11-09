@@ -10,8 +10,44 @@
 # Note: It's recommended to use `eval "$(wt hook bash)"` or `eval "$(wt hook zsh)"`
 # instead of sourcing this file, as it ensures you always get the latest version.
 
+# Return 0 when wt new / wt pr should print a path and the shell should cd.
+# Help, version, and --no-cd stay in the current directory.
+_wt_should_navigate() {
+  local cmd=""
+  local skip_value=0
+  local arg
+  for arg in "$@"; do
+    if (( skip_value )); then
+      skip_value=0
+      continue
+    fi
+    case "$arg" in
+      --)
+        break
+        ;;
+      -h|--help|help|--version|--no-cd)
+        return 1
+        ;;
+      --repo)
+        skip_value=1
+        ;;
+      --repo=*)
+        ;;
+      -*)
+        ;;
+      *)
+        if [[ -z "$cmd" ]]; then
+          cmd="$arg"
+        fi
+        ;;
+    esac
+  done
+  [[ "$cmd" == "new" || "$cmd" == "pr" ]]
+}
+
 # wt function
-# Acts as shell function for wt go / any command with --cd to execute actual cd
+# Acts as shell function for wt go / wt new / wt pr to execute actual cd.
+# wt new and wt pr stay put when --no-cd is passed.
 # Other commands are delegated to binary
 function wt() {
   # Set environment variable to indicate shell function is active
@@ -45,8 +81,8 @@ function wt() {
       # Not a path: show the output (help, usage, etc.)
       printf '%s\n' "$out"
     fi
-  elif [[ "$*" == *"--cd"* ]]; then
-    # If --cd flag exists, get path and cd
+  elif _wt_should_navigate "$@"; then
+    # new/pr: capture the path and cd
     local out
     out="$(command wt "$@")"
     local code=$?

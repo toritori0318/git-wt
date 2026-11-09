@@ -49,18 +49,20 @@ type ShellFunctionNotConfiguredError struct{}
 func (e *ShellFunctionNotConfiguredError) Error() string {
 	return `Cannot change directory: shell function not configured.
 
-To enable directory navigation with --cd flag, configure your shell:
+wt new and wt pr navigate into the worktree by default. Configure your shell:
 
   Bash:   echo 'eval "$(wt hook bash)"' >> ~/.bashrc
   Zsh:    echo 'eval "$(wt hook zsh)"' >> ~/.zshrc
   Fish:   wt hook fish > ~/.config/fish/functions/wt.fish
 
-Then restart your shell or run: exec $SHELL`
+Then restart your shell or run: exec $SHELL
+
+To stay in the current directory, pass --no-cd.`
 }
 
-// checkShellFunction checks if shell function is configured when using --cd flag
-func checkShellFunction(cdMode bool) error {
-	if !cdMode {
+// checkShellFunction checks if shell function is configured when the command will navigate.
+func checkShellFunction(navigate bool) error {
+	if !navigate {
 		return nil
 	}
 

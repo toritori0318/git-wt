@@ -24,7 +24,7 @@ git worktree add ../myproject-feature-login -b feature/login
 cd ../myproject-feature-login
 
 # With wt (subdirectory mode)
-wt new feature/login --cd  # Creates .myproject-wt/feature-login (--cd enables auto-navigation)
+wt new feature/login       # Creates .myproject-wt/feature-login and navigates there
 
 # Results in:
 # myproject/              ← main branch
@@ -62,7 +62,7 @@ export PATH="$PATH:$(go env GOPATH)/bin"
 
 **Why needed?** The wt binary cannot change your current directory directly (child processes can't modify parent shell state). Shell integration provides a wrapper function that enables:
 - `wt go` to actually navigate between worktrees
-- `--cd` flag on commands like `wt new --cd` and `wt pr --cd` to automatically navigate after creation
+- `wt new` and `wt pr` navigate into the new worktree by default (`--no-cd` stays put)
 
 Choose your shell:
 
@@ -99,13 +99,13 @@ type wt  # Should show "wt is a function"
 
 ```
 # new worktree
-wt new <branch> [<start-point>] [--cd]
+wt new <branch> [<start-point>] [--no-cd]
 
 # new worktree with tmux session
 wt tmux new <branch> [<start-point>] [--count <count>] [--sync-panes] [--layout <layout>]
 
 # new worktree from the GitHub PR number
-wt pr <pr-number> [--branch <branch>] [--cd]
+wt pr <pr-number> [--branch <branch>] [--no-cd] [--yes]
 
 # navigate between worktrees
 wt go [<filter>]
@@ -119,8 +119,8 @@ wt clean [<filter>] [--force] [--keep-branch] [--yes]
 
 ### Create Worktree
 ```bash
-wt new feature/new-ui              # Creates .myproject-wt/feature-new-ui (subdirectory mode)
-wt new feature/fix --cd            # Create and navigate immediately
+wt new feature/new-ui              # Creates .myproject-wt/feature-new-ui and navigates there
+wt new feature/fix --no-cd         # Create the worktree but stay in the current directory
 wt new bugfix/123 main             # Create from specific branch/commit
 ```
 
@@ -138,7 +138,7 @@ work/
     └── bugfix-123/         # wt new bugfix/123
 ```
 
-The `--cd` flag outputs only the path (for shell function navigation) instead of user-friendly messages.
+By default, `wt new` prints only the path so the shell function can `cd` there. `--no-cd` prints a summary and stays in the current directory.
 
 ### Tmux Sessions
 ```bash
@@ -184,20 +184,22 @@ wt clean --yes                # Skip all confirmations
 
 ### Review GitHub PRs
 ```bash
-wt pr 123                          # Checkout PR #123 for review
+wt pr 123                          # Checkout PR #123 and navigate there
 wt pr 123 --branch review/pr-123   # Specify custom local branch name
-wt pr 123 --cd                     # Navigate immediately after creation
-wt pr 123 --force                  # Skip all prompts, auto-use existing branches
+wt pr 123 --no-cd                  # Create the worktree but stay put
+wt pr 123 --no-cd --yes            # Stay put and skip confirmation prompts
 ```
 
 **Branch naming:** Uses the PR's original branch name by default (e.g., `feature/auth`).
 
 **Existing branch handling:**
-- If branch exists in a worktree:
-  - Without `--cd`: Shows info and exits
-  - With `--cd`: Prompts to navigate to existing worktree
-- If branch exists locally (not in worktree): Prompts to create worktree with existing branch
-- Use `--force` to skip all prompts
+- If the branch is already checked out in a worktree:
+  - Default: navigate there without asking
+  - With `--no-cd`: print the path and exit (does not navigate, even with `--yes`)
+- If the branch exists locally but is not in a worktree:
+  - Default and `--yes`: reuse it without asking
+  - With `--no-cd` and without `--yes`: ask before creating the worktree
+- `--quiet` also skips that prompt
 
 **Prerequisites:** Requires GitHub CLI (`gh`) and authentication:
 ```bash

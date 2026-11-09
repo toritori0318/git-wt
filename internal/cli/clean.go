@@ -274,7 +274,7 @@ func printBranchKeptMessage(w io.Writer, branch string, quiet bool) {
 }
 
 // confirm prompts user for confirmation. The prompt is written to stderr,
-// not stdout: `wt ... --cd` captures stdout via shell command substitution,
+// not stdout: navigating commands capture stdout via shell command substitution,
 // so a prompt on stdout would never reach the terminal and the read would
 // silently block.
 func confirm(message string) bool {

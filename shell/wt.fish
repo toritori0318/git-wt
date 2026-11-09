@@ -8,7 +8,36 @@
 #   wt hook fish > ~/.config/fish/functions/wt.fish
 
 # wt - Git worktree helper
-# Shell function: wt go / any command --cd executes actual cd
+# Shell function: wt go, wt new, and wt pr cd into the worktree.
+# wt new and wt pr stay put when --no-cd is passed.
+
+# Return 0 when wt new / wt pr should print a path and the shell should cd.
+# Help, version, and --no-cd stay in the current directory.
+function _wt_should_navigate
+    set -l cmd ""
+    set -l skip_value 0
+    for arg in $argv
+        if test $skip_value -eq 1
+            set skip_value 0
+            continue
+        end
+        switch $arg
+            case --
+                break
+            case -h --help help --version --no-cd
+                return 1
+            case --repo
+                set skip_value 1
+            case '--repo=*'
+            case '-*'
+            case '*'
+                if test -z "$cmd"
+                    set cmd $arg
+                end
+        end
+    end
+    test "$cmd" = new; or test "$cmd" = pr
+end
 
 function wt
     # Set environment variable to indicate shell function is active
@@ -40,8 +69,8 @@ function wt
             # Not a path: show the output
             printf '%s\n' "$out"
         end
-    else if contains -- --cd $argv
-        # If --cd flag exists, get path and cd
+    else if _wt_should_navigate $argv
+        # new/pr: capture the path and cd
         set -l out (command wt $argv)
         set -l code $status
 
