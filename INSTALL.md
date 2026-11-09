@@ -21,7 +21,7 @@ sudo mv wt /usr/local/bin/
 
 ### 2. Setup Shell Function (Required)
 
-To enable directory navigation with `wt go` and `--cd` flag (`wt new --cd`, `wt pr --cd`), add shell function to your configuration.
+To enable directory navigation with `wt go`, `wt new`, and `wt pr`, add shell function to your configuration. Pass `--no-cd` to `wt new` or `wt pr` to stay in the current directory.
 
 This setup dynamically loads the latest shell function from the binary, so updates are automatically reflected.
 

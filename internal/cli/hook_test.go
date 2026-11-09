@@ -172,6 +172,7 @@ func TestRunHookWithConfig(t *testing.T) {
 				if !strings.Contains(output, "function wt") && !strings.Contains(output, "wt()") {
 					t.Errorf("output doesn't contain shell function definition")
 				}
+				assertNavigatesByDefault(t, output)
 			},
 		},
 		{
@@ -182,6 +183,7 @@ func TestRunHookWithConfig(t *testing.T) {
 				if !strings.Contains(output, "function wt") && !strings.Contains(output, "wt()") {
 					t.Errorf("output doesn't contain shell function definition")
 				}
+				assertNavigatesByDefault(t, output)
 			},
 		},
 		{
@@ -192,6 +194,7 @@ func TestRunHookWithConfig(t *testing.T) {
 				if !strings.Contains(output, "function wt") {
 					t.Errorf("output doesn't contain fish function definition")
 				}
+				assertNavigatesByDefault(t, output)
 			},
 		},
 		{
@@ -219,6 +222,16 @@ func TestRunHookWithConfig(t *testing.T) {
 				tt.check(t, buf.String())
 			}
 		})
+	}
+}
+
+func assertNavigatesByDefault(t *testing.T, output string) {
+	t.Helper()
+	if !strings.Contains(output, "--no-cd") {
+		t.Errorf("hook should stay put when --no-cd is set")
+	}
+	if strings.Contains(strings.ReplaceAll(output, "--no-cd", ""), "--cd") {
+		t.Errorf("hook still references removed --cd flag")
 	}
 }
 

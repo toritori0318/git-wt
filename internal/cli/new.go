@@ -24,14 +24,7 @@ func (e *BranchInUseError) Error() string {
 		e.Branch, e.Path, e.Branch, e.Branch)
 }
 
-type newCmdConfig struct {
-	baseDir string
-	cd      bool
-}
-
 func newNewCmd() *cobra.Command {
-	cfg := &newCmdConfig{}
-
 	cmd := &cobra.Command{
 		Use:   "new <branch> [<start-point>]",
 		Short: "Create a new worktree",
@@ -39,7 +32,10 @@ func newNewCmd() *cobra.Command {
 
 Worktrees are automatically placed using the naming convention <repo>-<branch>.
 If an existing branch is specified, that branch will be checked out.
-For new branches, they are created from start-point (defaults to current HEAD if omitted).`,
+For new branches, they are created from start-point (defaults to current HEAD if omitted).
+
+By default, prints only the worktree path so the shell function can cd there.
+Pass --no-cd to stay in the current directory and print a summary instead.`,
 		Args: func(cmd *cobra.Command, args []string) error {
 			if len(args) < 1 || len(args) > 2 {
 				cmd.Help()
@@ -51,12 +47,9 @@ For new branches, they are created from start-point (defaults to current HEAD if
 			return nil
 		},
 		RunE: func(c *cobra.Command, args []string) error {
-			return runNewWithConfig(c, args, cfg)
+			return runNewWithConfig(c, args)
 		},
 	}
-
-	cmd.Flags().StringVar(&cfg.baseDir, "base-dir", "", "Base directory for worktree placement (defaults to repository parent)")
-	cmd.Flags().BoolVar(&cfg.cd, "cd", false, "Output worktree path to stdout after creation (for cd with shell function)")
 
 	return cmd
 }
@@ -67,11 +60,11 @@ func init() {
 	newCmd = newNewCmd()
 }
 
-func runNewWithConfig(cmd *cobra.Command, args []string, cfg *newCmdConfig) error {
+func runNewWithConfig(cmd *cobra.Command, args []string) error {
 	ctx := cmd.Context()
 
-	// Check if shell function is configured when using --cd
-	if err := checkShellFunction(cfg.cd); err != nil {
+	// Navigation is the default; --no-cd stays put and does not need the shell function.
+	if err := checkShellFunction(!flagNoCD); err != nil {
 		return err
 	}
 
@@ -93,7 +86,7 @@ func runNewWithConfig(cmd *cobra.Command, args []string, cfg *newCmdConfig) erro
 	}
 
 	// Determine and validate base directory
-	baseDir, err := resolveAndValidateBaseDir(cfg.baseDir, repo.Parent)
+	baseDir, err := resolveAndValidateBaseDir(flagBaseDir, repo.Parent)
 	if err != nil {
 		return err
 	}
@@ -125,7 +118,7 @@ func runNewWithConfig(cmd *cobra.Command, args []string, cfg *newCmdConfig) erro
 	}
 
 	// Success message
-	printSuccess(cmd.OutOrStdout(), worktreePath, branch, cfg.cd, flagQuiet)
+	printSuccess(cmd.OutOrStdout(), worktreePath, branch, !flagNoCD, flagQuiet)
 
 	return nil
 }
@@ -195,8 +188,8 @@ func checkBranchNotInUse(ctx context.Context, branch string) error {
 	return nil
 }
 
-func printSuccess(w io.Writer, worktreePath, branch string, cdMode, quiet bool) {
-	if cdMode {
+func printSuccess(w io.Writer, worktreePath, branch string, pathOnly, quiet bool) {
+	if pathOnly {
 		fmt.Fprintln(w, worktreePath)
 		return
 	}

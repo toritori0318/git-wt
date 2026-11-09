@@ -11,7 +11,6 @@ import (
 )
 
 type tmuxNewConfig struct {
-	baseDir     string
 	count       int
 	layout      string
 	syncPanes   bool
@@ -53,7 +52,6 @@ Examples:
 		},
 	}
 
-	cmd.Flags().StringVar(&cfg.baseDir, "base-dir", "", "Base directory for worktree placement (defaults to repository parent)")
 	cmd.Flags().IntVar(&cfg.count, "count", 1, "Number of worktrees to create")
 	cmd.Flags().StringVar(&cfg.layout, "layout", "tiled", "Tmux layout (tiled/horizontal/vertical)")
 	cmd.Flags().BoolVar(&cfg.syncPanes, "sync-panes", false, "Enable tmux synchronize-panes (send same input to all panes)")
@@ -131,7 +129,7 @@ func runTmuxNew(cmd *cobra.Command, args []string, cfg *tmuxNewConfig) error {
 	}
 
 	// Determine and validate base directory
-	baseDir, err := resolveAndValidateBaseDir(cfg.baseDir, repo.Parent)
+	baseDir, err := resolveAndValidateBaseDir(flagBaseDir, repo.Parent)
 	if err != nil {
 		return err
 	}

@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"bytes"
 	"reflect"
 	"strings"
 	"testing"
@@ -31,39 +32,39 @@ func TestExitCodeError(t *testing.T) {
 
 func TestShouldPassthrough(t *testing.T) {
 	tests := []struct {
-		name    string
-		errMsg  string
-		want    bool
+		name   string
+		errMsg string
+		want   bool
 	}{
 		{
-			name:    "unknown command should passthrough",
-			errMsg:  "unknown command \"list\" for \"wt\"",
-			want:    true,
+			name:   "unknown command should passthrough",
+			errMsg: "unknown command \"list\" for \"wt\"",
+			want:   true,
 		},
 		{
-			name:    "unknown flag should passthrough",
-			errMsg:  "unknown flag: --porcelain",
-			want:    true,
+			name:   "unknown flag should passthrough",
+			errMsg: "unknown flag: --porcelain",
+			want:   true,
 		},
 		{
-			name:    "unknown shorthand flag should passthrough",
-			errMsg:  "unknown shorthand flag: 'v' in -v",
-			want:    true,
+			name:   "unknown shorthand flag should passthrough",
+			errMsg: "unknown shorthand flag: 'v' in -v",
+			want:   true,
 		},
 		{
-			name:    "other errors should not passthrough",
-			errMsg:  "failed to execute command",
-			want:    false,
+			name:   "other errors should not passthrough",
+			errMsg: "failed to execute command",
+			want:   false,
 		},
 		{
-			name:    "nil error should not passthrough",
-			errMsg:  "",
-			want:    false,
+			name:   "nil error should not passthrough",
+			errMsg: "",
+			want:   false,
 		},
 		{
-			name:    "uppercase unknown command",
-			errMsg:  "Unknown Command \"test\"",
-			want:    true,
+			name:   "uppercase unknown command",
+			errMsg: "Unknown Command \"test\"",
+			want:   true,
 		},
 	}
 
@@ -137,6 +138,11 @@ func TestFilterPassthroughArgs(t *testing.T) {
 			args: []string{"add", "/path", "--debug", "-b", "branch", "--quiet"},
 			want: []string{"add", "/path", "-b", "branch"},
 		},
+		{
+			name: "remove no-cd and value flags before the subcommand",
+			args: []string{"--no-cd", "--base-dir", "/tmp/wt", "--branch", "feature/x", "--remote=upstream", "new", "feature/x"},
+			want: []string{"new", "feature/x"},
+		},
 	}
 
 	for _, tt := range tests {
@@ -146,6 +152,37 @@ func TestFilterPassthroughArgs(t *testing.T) {
 				t.Errorf("filterPassthroughArgs(%v) = %v, want %v", tt.args, got, tt.want)
 			}
 		})
+	}
+}
+
+func TestLeadingPersistentFlags(t *testing.T) {
+	origNoCD := flagNoCD
+	origBaseDir := flagBaseDir
+	origBranch := flagBranch
+	origRemote := flagRemote
+	t.Cleanup(func() {
+		flagNoCD = origNoCD
+		flagBaseDir = origBaseDir
+		flagBranch = origBranch
+		flagRemote = origRemote
+		rootCmd.SetArgs(nil)
+		rootCmd.SetOut(nil)
+		rootCmd.SetErr(nil)
+	})
+
+	var buf bytes.Buffer
+	rootCmd.SetOut(&buf)
+	rootCmd.SetErr(&buf)
+	rootCmd.SetArgs([]string{"--no-cd", "--base-dir", "/tmp/wt-base", "--branch", "feature/x", "--remote", "fork", "new", "--help"})
+
+	if err := rootCmd.Execute(); err != nil {
+		t.Fatalf("leading flags before new: %v\n%s", err, buf.String())
+	}
+	if !flagNoCD || flagBaseDir != "/tmp/wt-base" || flagBranch != "feature/x" || flagRemote != "fork" {
+		t.Fatalf("flags not parsed: noCD=%v base=%q branch=%q remote=%q", flagNoCD, flagBaseDir, flagBranch, flagRemote)
+	}
+	if strings.Contains(buf.String(), "unknown option") || strings.Contains(buf.String(), "unknown flag") {
+		t.Fatalf("leading flags were rejected:\n%s", buf.String())
 	}
 }
 

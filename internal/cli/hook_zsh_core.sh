@@ -1,5 +1,41 @@
 # wt - Git worktree helper
-# Shell function: wt go / any command --cd executes actual cd
+# Shell function: wt go, wt new, and wt pr cd into the worktree.
+# wt new and wt pr stay put when --no-cd is passed.
+
+# Return 0 when wt new / wt pr should print a path and the shell should cd.
+# Help, version, and --no-cd stay in the current directory.
+_wt_should_navigate() {
+  local cmd=""
+  local skip_value=0
+  local arg
+  for arg in "$@"; do
+    if (( skip_value )); then
+      skip_value=0
+      continue
+    fi
+    case "$arg" in
+      --)
+        break
+        ;;
+      -h|--help|help|--version|--no-cd)
+        return 1
+        ;;
+      --repo|--base-dir|--branch|--remote)
+        skip_value=1
+        ;;
+      --repo=*|--base-dir=*|--branch=*|--remote=*)
+        ;;
+      -*)
+        ;;
+      *)
+        if [[ -z "$cmd" ]]; then
+          cmd="$arg"
+        fi
+        ;;
+    esac
+  done
+  [[ "$cmd" == "new" || "$cmd" == "pr" ]]
+}
 
 function wt() {
   # Set environment variable to indicate shell function is active
@@ -33,8 +69,8 @@ function wt() {
       # Not a path: show the output (help, usage, etc.)
       printf '%s\n' "$out"
     fi
-  elif [[ "$*" == *"--cd"* ]]; then
-    # If --cd flag exists, get path and cd
+  elif _wt_should_navigate "$@"; then
+    # new/pr: capture the path and cd
     local out
     out="$(command wt "$@")"
     local code=$?
