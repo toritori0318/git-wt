@@ -52,12 +52,12 @@ Navigation:
 
 Existing Branch Handling:
   - If the branch is already checked out in a worktree:
-    - Default: navigate there without asking
+    - Default: ask before navigating. Pressing Enter accepts (Y/n)
+    - --yes or --quiet: navigate without asking
     - With --no-cd: print the path and exit (does not navigate, even with --yes)
   - If the branch exists locally but is not in a worktree:
-    - Default and --yes: reuse it without asking
-    - With --no-cd and without --yes: ask before creating the worktree
-  - --quiet also skips that prompt
+    - Default: ask before reusing it. Pressing Enter accepts (Y/n)
+    - --yes or --quiet: reuse it without asking
 
 Prerequisites:
   - GitHub CLI (gh) must be installed
@@ -74,7 +74,7 @@ Examples:
 		},
 	}
 
-	cmd.Flags().BoolVar(&cfg.yes, "yes", false, "Skip confirmation prompts")
+	cmd.Flags().BoolVar(&cfg.yes, "yes", false, "Skip confirmation prompts and accept them")
 
 	return cmd
 }
@@ -143,13 +143,16 @@ func runPRWithConfig(cmd *cobra.Command, args []string, cfg *prCmdConfig) error 
 
 	if existingWT != nil {
 		// Already checked out. --no-cd reports the path and stays put.
-		// Otherwise navigate without asking (default, and --yes).
+		// Otherwise ask, with Enter meaning yes. --yes and --quiet skip the question.
 		if flagNoCD {
 			fmt.Fprintf(w, "Branch '%s' is already in use by worktree: %s\n", localBranch, existingWT.Path)
 			fmt.Fprintf(w, "Path: %s\n", existingWT.Path)
 			return nil
 		}
 		printExistingWorktreeNotice(os.Stderr, localBranch, flagQuiet)
+		if !cfg.yes && !flagQuiet && !confirmDefaultYes("Navigate to existing worktree?") {
+			return fmt.Errorf("operation cancelled")
+		}
 		fmt.Fprintln(w, existingWT.Path)
 		return nil
 	}
@@ -161,10 +164,8 @@ func runPRWithConfig(cmd *cobra.Command, args []string, cfg *prCmdConfig) error 
 	}
 
 	if branchExists {
-		// Default navigation and --yes reuse the branch without asking.
-		// --no-cd still asks, unless --yes or --quiet.
-		autoYes := cfg.yes || pathOnly
-		if confirmed, err := confirmUseExisting(w, localBranch, autoYes, flagQuiet); err != nil {
+		// Ask before reusing the branch. Enter means yes. --yes and --quiet skip the question.
+		if confirmed, err := confirmUseExisting(os.Stderr, localBranch, cfg.yes, flagQuiet); err != nil {
 			return err
 		} else if !confirmed {
 			return fmt.Errorf("operation cancelled")
@@ -233,15 +234,15 @@ func printExistingWorktreeNotice(w io.Writer, branch string, quiet bool) {
 	fmt.Fprintf(w, "Branch '%s' is already in use by worktree.\n", branch)
 }
 
-// confirmUseExisting asks user if they want to use an existing branch for new worktree.
-// autoYes skips the prompt (default navigation, --yes, or the caller decided to).
-func confirmUseExisting(w io.Writer, branch string, autoYes, quiet bool) (bool, error) {
-	if autoYes || quiet {
+// confirmUseExisting asks whether to reuse a local branch that is not in a worktree.
+// skip (--yes) and quiet accept without asking. The notice goes to w, which callers
+// must set to stderr: navigating commands capture stdout for the shell.
+func confirmUseExisting(w io.Writer, branch string, skip, quiet bool) (bool, error) {
+	if skip || quiet {
 		return true, nil
 	}
 	fmt.Fprintf(w, "Branch '%s' already exists locally.\n", branch)
-	confirmed := confirm("Create new worktree using existing branch?")
-	return confirmed, nil
+	return confirmDefaultYes("Create new worktree using existing branch?"), nil
 }
 
 func determineRemote(w io.Writer, userRemote string, prInfo *ghx.PRInfo, prNumber int, pathOnly, quiet bool) (remote, tempRemote string, err error) {
