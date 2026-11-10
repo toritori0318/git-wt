@@ -51,6 +51,33 @@ func TestConfirmWithIO(t *testing.T) {
 	}
 }
 
+func TestConfirmAnswerDefaultYes(t *testing.T) {
+	tests := []struct {
+		name  string
+		input string
+		want  bool
+	}{
+		{name: "enter accepts", input: "\n", want: true},
+		{name: "y accepts", input: "y\n", want: true},
+		{name: "n declines", input: "n\n", want: false},
+		{name: "no declines", input: "no\n", want: false},
+		{name: "EOF does not accept", input: "", want: false},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			var out strings.Builder
+			got := confirmAnswer(strings.NewReader(tt.input), &out, "Navigate?", true)
+			if got != tt.want {
+				t.Errorf("confirmAnswer(%q) = %v, want %v", tt.input, got, tt.want)
+			}
+			if !strings.Contains(out.String(), "(Y/n)") {
+				t.Errorf("expected Y/n prompt, got: %q", out.String())
+			}
+		})
+	}
+}
+
 func TestConfirmWithIOWritesPromptToGivenWriter(t *testing.T) {
 	var out strings.Builder
 	confirmWithIO(strings.NewReader("y\n"), &out, "Proceed?")

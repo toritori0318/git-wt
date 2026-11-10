@@ -138,32 +138,22 @@ func TestPrintExistingWorktreeNotice(t *testing.T) {
 
 func TestConfirmUseExisting(t *testing.T) {
 	tests := []struct {
-		name     string
-		branch   string
-		autoYes  bool
-		quiet    bool
-		wantSkip bool // Should skip prompt and auto-confirm
+		name    string
+		branch  string
+		autoYes bool
+		quiet   bool
 	}{
 		{
-			name:     "auto yes skips prompt",
-			branch:   "feature/auth",
-			autoYes:  true,
-			quiet:    false,
-			wantSkip: true,
+			name:    "auto yes skips prompt",
+			branch:  "feature/auth",
+			autoYes: true,
+			quiet:   false,
 		},
 		{
-			name:     "quiet mode skips prompt",
-			branch:   "feature/login",
-			autoYes:  false,
-			quiet:    true,
-			wantSkip: true,
-		},
-		{
-			name:     "no-cd without yes requires prompt",
-			branch:   "bugfix/123",
-			autoYes:  false,
-			quiet:    false,
-			wantSkip: false,
+			name:    "quiet mode skips prompt",
+			branch:  "feature/login",
+			autoYes: false,
+			quiet:   true,
 		},
 	}
 
@@ -172,20 +162,11 @@ func TestConfirmUseExisting(t *testing.T) {
 			var buf strings.Builder
 			confirmed, err := confirmUseExisting(&buf, tt.branch, tt.autoYes, tt.quiet)
 
-			if tt.wantSkip {
-				// Should auto-confirm without error
-				if err != nil {
-					t.Errorf("expected no error with skip=true, got %v", err)
-				}
-				if !confirmed {
-					t.Errorf("expected confirmed=true with skip, got false")
-				}
-			} else {
-				// Would require stdin in normal mode
-				// Just verify the function was called
-				if err == nil {
-					t.Log("confirmUseExisting completed (possibly with default behavior)")
-				}
+			if err != nil {
+				t.Errorf("expected no error when skipping the prompt, got %v", err)
+			}
+			if !confirmed {
+				t.Errorf("expected confirmed=true when skipping the prompt, got false")
 			}
 		})
 	}

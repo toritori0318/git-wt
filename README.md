@@ -194,12 +194,12 @@ wt pr 123 --no-cd --yes            # Stay put and skip confirmation prompts
 
 **Existing branch handling:**
 - If the branch is already checked out in a worktree:
-  - Default: navigate there without asking
+  - Default: ask before navigating. Pressing Enter accepts (`Y/n`)
+  - `--yes` or `--quiet`: navigate without asking
   - With `--no-cd`: print the path and exit (does not navigate, even with `--yes`)
 - If the branch exists locally but is not in a worktree:
-  - Default and `--yes`: reuse it without asking
-  - With `--no-cd` and without `--yes`: ask before creating the worktree
-- `--quiet` also skips that prompt
+  - Default: ask before reusing it. Pressing Enter accepts (`Y/n`)
+  - `--yes` or `--quiet`: reuse it without asking
 
 **Prerequisites:** Requires GitHub CLI (`gh`) and authentication:
 ```bash

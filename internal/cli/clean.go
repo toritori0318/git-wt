@@ -281,9 +281,23 @@ func confirm(message string) bool {
 	return confirmWithIO(os.Stdin, os.Stderr, message)
 }
 
+// confirmDefaultYes asks a question whose Enter answer is yes.
+// wt clean keeps confirm, whose Enter answer is no.
+func confirmDefaultYes(message string) bool {
+	return confirmAnswer(os.Stdin, os.Stderr, message, true)
+}
+
 func confirmWithIO(r io.Reader, w io.Writer, message string) bool {
+	return confirmAnswer(r, w, message, false)
+}
+
+func confirmAnswer(r io.Reader, w io.Writer, message string, defaultYes bool) bool {
 	reader := bufio.NewReader(r)
-	fmt.Fprintf(w, "%s (y/N): ", message)
+	hint := "(y/N)"
+	if defaultYes {
+		hint = "(Y/n)"
+	}
+	fmt.Fprintf(w, "%s %s: ", message, hint)
 
 	input, err := reader.ReadString('\n')
 	if err != nil && input == "" {
@@ -291,5 +305,8 @@ func confirmWithIO(r io.Reader, w io.Writer, message string) bool {
 	}
 
 	input = strings.TrimSpace(strings.ToLower(input))
+	if input == "" {
+		return defaultYes
+	}
 	return input == "y" || input == "yes"
 }
