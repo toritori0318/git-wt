@@ -14,13 +14,19 @@ GOTEST=$(GOCMD) test
 GOGET=$(GOCMD) get
 GOMOD=$(GOCMD) mod
 
+# Stamped into `wt version` / `wt --version`. Override with make VERSION=v1.2.3.
+VERSION ?= $(shell git describe --tags --always --dirty 2>/dev/null || echo dev)
+COMMIT  ?= $(shell git rev-parse --short=7 HEAD 2>/dev/null || echo unknown)
+DATE    ?= $(shell date -u +%Y-%m-%dT%H:%M:%SZ)
+LDFLAGS := -X main.version=$(VERSION) -X main.commit=$(COMMIT) -X main.date=$(DATE)
+
 # Build the project
 build:
-	$(GOBUILD) -buildvcs=false -o $(BUILD_DIR)/$(BINARY_NAME) ./cmd/wt
+	$(GOBUILD) -ldflags "$(LDFLAGS)" -o $(BUILD_DIR)/$(BINARY_NAME) ./cmd/wt
 
 # Install to $GOPATH/bin
 install:
-	$(GOCMD) install ./cmd/wt
+	$(GOCMD) install -ldflags "$(LDFLAGS)" ./cmd/wt
 
 # Clean build files
 clean:
@@ -40,14 +46,14 @@ deps:
 build-all: build-linux build-darwin build-windows
 
 build-linux:
-	GOOS=linux GOARCH=amd64 $(GOBUILD) -buildvcs=false -o $(BUILD_DIR)/$(BINARY_NAME)-linux-amd64 ./cmd/wt
+	GOOS=linux GOARCH=amd64 $(GOBUILD) -ldflags "$(LDFLAGS)" -o $(BUILD_DIR)/$(BINARY_NAME)-linux-amd64 ./cmd/wt
 
 build-darwin:
-	GOOS=darwin GOARCH=amd64 $(GOBUILD) -buildvcs=false -o $(BUILD_DIR)/$(BINARY_NAME)-darwin-amd64 ./cmd/wt
-	GOOS=darwin GOARCH=arm64 $(GOBUILD) -buildvcs=false -o $(BUILD_DIR)/$(BINARY_NAME)-darwin-arm64 ./cmd/wt
+	GOOS=darwin GOARCH=amd64 $(GOBUILD) -ldflags "$(LDFLAGS)" -o $(BUILD_DIR)/$(BINARY_NAME)-darwin-amd64 ./cmd/wt
+	GOOS=darwin GOARCH=arm64 $(GOBUILD) -ldflags "$(LDFLAGS)" -o $(BUILD_DIR)/$(BINARY_NAME)-darwin-arm64 ./cmd/wt
 
 build-windows:
-	GOOS=windows GOARCH=amd64 $(GOBUILD) -buildvcs=false -o $(BUILD_DIR)/$(BINARY_NAME)-windows-amd64.exe ./cmd/wt
+	GOOS=windows GOARCH=amd64 $(GOBUILD) -ldflags "$(LDFLAGS)" -o $(BUILD_DIR)/$(BINARY_NAME)-windows-amd64.exe ./cmd/wt
 
 # Show help
 help:
@@ -59,3 +65,5 @@ help:
 	@echo "  deps        - Download and tidy dependencies"
 	@echo "  build-all   - Build for all platforms"
 	@echo "  help        - Show this help message"
+	@echo ""
+	@echo "Version stamped into the binary: $(VERSION)"

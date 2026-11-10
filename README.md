@@ -89,6 +89,7 @@ exec fish
 ```bash
 # Check binary
 wt --help
+wt version
 wt --version
 
 # Verify shell function is loaded
@@ -109,6 +110,9 @@ wt pr <pr-number> [--branch <branch>] [--no-cd] [--yes]
 
 # navigate between worktrees
 wt go [<filter>]
+
+# print the release version
+wt version
 
 # open worktree in editor
 wt open [<filter>] [--editor <editor>]
@@ -297,6 +301,19 @@ sudo apt install gh
 # Authenticate
 gh auth login
 ```
+
+## Releasing
+
+`wt version` and `wt --version` print the same string. A release tag is that version.
+
+```bash
+git tag v0.1.0
+git push origin v0.1.0
+```
+
+Pushing a `vX.Y.Z` tag builds Linux and macOS binaries and publishes them as a GitHub Release. The binaries report that tag.
+
+`go install github.com/toritori0318/git-wt/cmd/wt@v0.1.0` reports the same version. `make build` stamps `git describe` instead, so a build on a tag matches the release.
 
 ## Documentation
 

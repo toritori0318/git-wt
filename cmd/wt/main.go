@@ -15,6 +15,7 @@ var (
 )
 
 func main() {
+	version, commit, date = cli.ResolveVersion(version, commit, date)
 	cli.SetVersionInfo(version, commit, date)
 	if err := cli.Execute(); err != nil {
 		var exitCodeErr *cli.ExitCodeError

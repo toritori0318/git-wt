@@ -54,7 +54,8 @@ exec fish
 # Display help
 wt --help
 
-# Check version (verify it's installed in GOPATH)
+# Check version
+wt version
 which wt
 ```
 

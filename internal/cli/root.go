@@ -44,7 +44,7 @@ func SetVersionInfo(version, commit, date string) {
 	versionInfo = version
 	commitInfo = commit
 	dateInfo = date
-	rootCmd.Version = fmt.Sprintf("%s (commit: %s, built: %s)", version, commit, date)
+	rootCmd.Version = FormatVersion(version, commit, date)
 }
 
 // ShellFunctionNotConfiguredError represents an error when shell function is not configured
@@ -124,6 +124,8 @@ func init() {
 	// This allows subcommands to handle their own arguments correctly
 	rootCmd.TraverseChildren = true
 
+	rootCmd.SetVersionTemplate("{{.Version}}\n")
+
 	rootCmd.PersistentFlags().StringVar(&flagRepo, "repo", "", "Manually specify repository root path")
 	rootCmd.PersistentFlags().BoolVar(&flagQuiet, "quiet", false, "Minimal output")
 	rootCmd.PersistentFlags().BoolVar(&flagDebug, "debug", false, "Debug mode (show command execution)")
@@ -182,7 +184,7 @@ func shouldPassthrough(err error) bool {
 	// This prevents issues with arguments that look like flags (e.g., "-wttt")
 	if len(os.Args) > 1 {
 		subcommand := os.Args[1]
-		knownSubcommands := []string{"config", "new", "go", "clean", "pr", "open", "hook", "tmux"}
+		knownSubcommands := []string{"config", "new", "go", "clean", "pr", "open", "hook", "tmux", "version"}
 		for _, known := range knownSubcommands {
 			if subcommand == known {
 				return false
