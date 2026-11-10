@@ -100,6 +100,7 @@ complete -c wt -n "__fish_use_subcommand" -a "clean" -d "Remove worktrees"
 complete -c wt -n "__fish_use_subcommand" -a "open" -d "Open worktree in editor"
 complete -c wt -n "__fish_use_subcommand" -a "pr" -d "Create worktree for PR review"
 complete -c wt -n "__fish_use_subcommand" -a "hook" -d "Output shell hook scripts"
+complete -c wt -n "__fish_use_subcommand" -a "version" -d "Print version information"
 complete -c wt -n "__fish_use_subcommand" -a "help" -d "Show help"
 
 # Branch name completion for wt go

@@ -101,6 +101,7 @@ _wt() {
     'open:Open worktree in editor'
     'pr:Create worktree for PR review'
     'hook:Output shell hook scripts'
+    'version:Print version information'
     'help:Show help'
   )
 

@@ -112,7 +112,7 @@ if [[ -n "$BASH_VERSION" ]]; then
 
     # Subcommands
     if [[ $COMP_CWORD -eq 1 ]]; then
-      COMPREPLY=($(compgen -W "new go clean open pr hook help" -- "$cur"))
+      COMPREPLY=($(compgen -W "new go clean open pr hook version help" -- "$cur"))
       return
     fi
 
@@ -137,6 +137,7 @@ if [[ -n "$ZSH_VERSION" ]]; then
       'open:Open worktree in editor'
       'pr:Create worktree for PR review'
       'hook:Output shell hook scripts'
+      'version:Print version information'
       'help:Show help'
     )
 

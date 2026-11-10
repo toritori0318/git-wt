@@ -98,7 +98,7 @@ _wt_completion() {
 
   # Subcommands
   if [[ $COMP_CWORD -eq 1 ]]; then
-    COMPREPLY=($(compgen -W "new go clean open pr hook help" -- "$cur"))
+    COMPREPLY=($(compgen -W "new go clean open pr hook version help" -- "$cur"))
     return
   fi
 
